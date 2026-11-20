@@ -1,5 +1,5 @@
-// Kör `eslint --fix` med pluginets recommended-konfiguration på en fil var som helst på disken.
-// Används av golden-sviten: node test/run.mjs --cmd "node …/eslint-fix.ts {file}"
+// Runs `eslint --fix` with the plugin's recommended config on a file anywhere on disk.
+// Used by the golden suite: node test/run.mjs --cmd "node …/eslint-fix.ts {file}"
 import { dirname, resolve } from 'node:path';
 import { ESLint } from 'eslint';
 import plugin from '../src/index.ts';

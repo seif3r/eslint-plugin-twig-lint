@@ -1,7 +1,7 @@
 <?php
 // Parse-check Twig files with Drupal functions/filters stubbed.
-// Användning: TWIG_AUTOLOAD=<projekt>/vendor/autoload.php php test/parse-check.php <filer...>
-require getenv('TWIG_AUTOLOAD') ?: exit("Sätt TWIG_AUTOLOAD till en vendor/autoload.php som innehåller twig/twig\n");
+// Usage: TWIG_AUTOLOAD=<project>/vendor/autoload.php php test/parse-check.php <files...>
+require getenv('TWIG_AUTOLOAD') ?: exit("Set TWIG_AUTOLOAD to a vendor/autoload.php that includes twig/twig\n");
 $t = new \Twig\Environment(new \Twig\Loader\ArrayLoader([]));
 $t->registerUndefinedFunctionCallback(fn($n) => new \Twig\TwigFunction($n, fn() => null));
 $t->registerUndefinedFilterCallback(fn($n) => new \Twig\TwigFilter($n, fn($x) => $x));

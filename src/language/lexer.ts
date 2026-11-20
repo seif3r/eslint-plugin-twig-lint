@@ -1,6 +1,6 @@
-// Delar upp en Twig-mall i segment: text, output ({{ }}), block ({% %}) och kommentarer ({# #}).
-// Innehållet i output och block tokeniseras. `}}`/`%}` avslutar bara när parentesstacken är tom,
-// precis som Twigs egen lexer. Innehållet i {% verbatim %}/{% raw %} tokeniseras inte.
+// Splits a Twig template into segments: text, output ({{ }}), block ({% %}) and comments ({# #}).
+// Output and block contents are tokenized. `}}`/`%}` only ends a segment when no brackets are open,
+// just like Twig's own lexer. The contents of {% verbatim %}/{% raw %} are not tokenized.
 
 export type TokenType = 'name' | 'number' | 'string' | 'operator' | 'punctuation';
 
@@ -9,7 +9,7 @@ export interface Token {
   value: string;
   start: number;
   end: number;
-  /** För öppnande parenteser: index för den matchande stängande parentesen i samma segment. */
+  /** For opening brackets: index of the matching closing bracket in the same segment. */
   match?: number;
 }
 
@@ -19,18 +19,18 @@ export interface Segment {
   kind: SegmentKind;
   start: number;
   end: number;
-  /** Twig-segment: position direkt efter öppningsavgränsaren (inklusive `-`/`~`). */
+  /** Twig segments: position right after the opening delimiter (including `-`/`~`). */
   innerStart: number;
-  /** Twig-segment: start för stängningsavgränsaren (inklusive `-`/`~`). */
+  /** Twig segments: start of the closing delimiter (including `-`/`~`). */
   closeStart: number;
-  /** Öppningsavgränsaren, t.ex. `{{`, `{%-`. Tom för text. */
+  /** The opening delimiter, e.g. `{{`, `{%-`. Empty for text. */
   open: string;
-  /** Stängningsavgränsaren, t.ex. `}}`, `-%}`. Tom för text. */
+  /** The closing delimiter, e.g. `}}`, `-%}`. Empty for text. */
   close: string;
   tokens: Token[];
-  /** Block-segment: taggnamnet (första namn-token). */
+  /** Block segments: the tag name (first name token). */
   tag: string;
-  /** Text inuti {% verbatim %}/{% raw %}. */
+  /** Text inside {% verbatim %}/{% raw %}. */
   verbatim: boolean;
 }
 
@@ -83,7 +83,7 @@ export function lex(src: string): Segment[] {
       const m = re.exec(src);
       if (!m) {
         throw new TwigParseError(
-          `{% ${seg.tag} %} på rad ${lineAt(src, seg.start)} saknar {% end${seg.tag} %}`,
+          `{% ${seg.tag} %} on line ${lineAt(src, seg.start)} has no {% end${seg.tag} %}`,
           seg.start,
         );
       }
@@ -117,7 +117,7 @@ function lexTwig(src: string, start: number): Segment {
   if (type === '#') {
     const c = src.indexOf('#}', i);
     if (c < 0) {
-      throw new TwigParseError(`Kommentaren på rad ${lineAt(src, start)} stängs aldrig`, start);
+      throw new TwigParseError(`Comment on line ${lineAt(src, start)} is never closed`, start);
     }
     let closeStart = c;
     if (c - 1 >= innerStart && (src[c - 1] === '-' || src[c - 1] === '~')) closeStart = c - 1;
@@ -137,7 +137,7 @@ function lexTwig(src: string, start: number): Segment {
     const first = tokens[0];
     const tag = kind === 'block' && first && first.type === 'name' ? first.value : '';
     if (kind === 'block' && !tag) {
-      throw new TwigParseError(`Blocktaggen på rad ${lineAt(src, start)} saknar namn`, start);
+      throw new TwigParseError(`Block tag on line ${lineAt(src, start)} has no name`, start);
     }
     return {
       kind, start, end, innerStart, closeStart, open, close: src.slice(closeStart, end),
@@ -156,11 +156,11 @@ function lexTwig(src: string, start: number): Segment {
       if (firstOpen !== undefined) {
         const tk = tokens[firstOpen]!;
         throw new TwigParseError(
-          `"${open}" på rad ${lineAt(src, start)} stängs aldrig (parentesen "${tk.value}" på rad ${lineAt(src, tk.start)} är öppen)`,
+          `"${open}" on line ${lineAt(src, start)} is never closed (bracket "${tk.value}" on line ${lineAt(src, tk.start)} is still open)`,
           start,
         );
       }
-      throw new TwigParseError(`"${open}" på rad ${lineAt(src, start)} stängs aldrig`, start);
+      throw new TwigParseError(`"${open}" on line ${lineAt(src, start)} is never closed`, start);
     }
     const c = src[i]!;
 
@@ -197,12 +197,12 @@ function lexTwig(src: string, start: number): Segment {
       } else if (c === ')' || c === ']' || c === '}') {
         const top = stack.pop();
         if (top === undefined) {
-          throw new TwigParseError(`Oväntad "${c}" på rad ${lineAt(src, i)}`, i);
+          throw new TwigParseError(`Unexpected "${c}" on line ${lineAt(src, i)}`, i);
         }
         const opener = tokens[top]!;
         if (CLOSER_FOR[opener.value] !== c) {
           throw new TwigParseError(
-            `"${c}" på rad ${lineAt(src, i)} matchar inte "${opener.value}" på rad ${lineAt(src, opener.start)}`,
+            `"${c}" on line ${lineAt(src, i)} does not match "${opener.value}" on line ${lineAt(src, opener.start)}`,
             i,
           );
         }
@@ -212,7 +212,7 @@ function lexTwig(src: string, start: number): Segment {
       i++;
       continue;
     }
-    throw new TwigParseError(`Oväntat tecken "${c}" på rad ${lineAt(src, i)}`, i);
+    throw new TwigParseError(`Unexpected character "${c}" on line ${lineAt(src, i)}`, i);
   }
 }
 
@@ -231,7 +231,7 @@ function scanString(src: string, start: number): number {
       j++;
     }
   }
-  throw new TwigParseError(`Strängen på rad ${lineAt(src, start)} stängs aldrig`, start);
+  throw new TwigParseError(`String on line ${lineAt(src, start)} is never closed`, start);
 }
 
 function skipInterpolation(src: string, from: number): number {
@@ -247,5 +247,5 @@ function skipInterpolation(src: string, from: number): number {
     else if (ch === '}' && --depth === 0) return j + 1;
     j++;
   }
-  throw new TwigParseError(`Interpolationen på rad ${lineAt(src, from)} stängs aldrig`, from);
+  throw new TwigParseError(`Interpolation on line ${lineAt(src, from)} is never closed`, from);
 }

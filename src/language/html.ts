@@ -1,5 +1,5 @@
-// HTML-skanning på en maskad kopia av källan. Twig-segment är ersatta med \0 (radbrytningar behålls),
-// så positionerna stämmer med originalet och Twig-uttryck stör inte skanningen.
+// HTML scanning on a masked copy of the source. Twig segments are replaced with \0 (newlines are kept),
+// so positions match the original and Twig expressions do not interfere with the scan.
 
 import { TwigParseError, lineAt, type Segment } from './lexer.ts';
 
@@ -17,11 +17,11 @@ export interface HtmlTag {
   closing: boolean;
   selfClosing: boolean;
   void: boolean;
-  /** Taggnamnet är ett Twig-uttryck, t.ex. `<{{ type }}>`. */
+  /** The tag name is a Twig expression, e.g. `<{{ type }}>`. */
   dynamic: boolean;
-  /** Position för `>`, eller för `/` i `/>`. */
+  /** Position of `>`, or of `/` in `/>`. */
   closeStart: number;
-  /** Attributvärden inom citattecken, inklusive citattecknen. */
+  /** Quoted attribute values, including the quotes. */
   attrValues: Range[];
 }
 
@@ -104,7 +104,7 @@ export function scanHtml(src: string, masked: string): HtmlScan {
     }
     if (j >= masked.length) {
       throw new TwigParseError(
-        `HTML-taggen "${src.slice(i, nameEnd)}" på rad ${lineAt(src, i)} stängs aldrig`,
+        `HTML tag "${src.slice(i, nameEnd)}" on line ${lineAt(src, i)} is never closed`,
         i,
       );
     }
@@ -121,11 +121,11 @@ export function scanHtml(src: string, masked: string): HtmlScan {
     if (!closing && !selfClosing && !dynamic && RAW_ELEMENTS.has(name)) {
       const c = lower.indexOf(`</${name}`, i);
       if (c < 0) {
-        throw new TwigParseError(`<${name}> på rad ${lineAt(src, tag.start)} stängs aldrig`, tag.start);
+        throw new TwigParseError(`<${name}> on line ${lineAt(src, tag.start)} is never closed`, tag.start);
       }
       const e = masked.indexOf('>', c);
       if (e < 0) {
-        throw new TwigParseError(`</${name} på rad ${lineAt(src, c)} stängs aldrig`, c);
+        throw new TwigParseError(`</${name} on line ${lineAt(src, c)} is never closed`, c);
       }
       const close: HtmlTag = {
         start: c, end: e + 1, name, nameStart: c + 2, nameEnd: c + 2 + name.length, closing: true,

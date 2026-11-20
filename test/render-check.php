@@ -1,17 +1,17 @@
 <?php
-// Kontrollerar att input.twig och expected.twig ger samma sida i webbläsaren.
+// Checks that input.twig and expected.twig produce the same page in a browser.
 //
-// Användning:
-//   TWIG_AUTOLOAD=<projekt>/vendor/autoload.php php test/render-check.php test/fixtures/<namn> [...]
+// Usage:
+//   TWIG_AUTOLOAD=<project>/vendor/autoload.php php test/render-check.php test/fixtures/<name> [...]
 //
-// Båda filerna renderas med Twig (Drupal-funktioner och filter ersätts med stubbar, och alla
-// variabler är satta till enkla testvärden). Sedan jämförs HTML-trädet: elementnamn, attribut och text.
-// Text jämförs med blanksteg ihopslagna enligt HTML, utom i pre/textarea där den måste vara exakt lika.
-// Varje fixture renderas med flaggorna både sanna och falska.
+// Both files are rendered with Twig (Drupal functions and filters are stubbed, and all variables
+// are set to simple test values). Then the HTML trees are compared: element names, attributes and text.
+// Text is compared with whitespace collapsed as in HTML, except in pre/textarea where it must match exactly.
+// Each fixture is rendered with the flags both true and false.
 
 ini_set('display_errors', '0');
 error_reporting(E_ALL & ~E_WARNING & ~E_NOTICE);
-require getenv('TWIG_AUTOLOAD') ?: exit("Sätt TWIG_AUTOLOAD till en vendor/autoload.php som innehåller twig/twig\n");
+require getenv('TWIG_AUTOLOAD') ?: exit("Set TWIG_AUTOLOAD to a vendor/autoload.php that includes twig/twig\n");
 
 final class AnyLoader implements \Twig\Loader\LoaderInterface {
   public array $t = [];
@@ -81,14 +81,14 @@ function tree(string $html): array {
     }
   };
   $walk($d->getElementsByTagName('body')->item(0), false);
-  // Blanksteg mellan blockelement spelar ingen roll. Ta bort "ws" som gränsar till block.
+  // Whitespace between block elements does not matter. Drop "ws" next to blocks.
   $block = '/^<\/?(div|p|ul|ol|li|figure|figcaption|nav|h\d|section|article|select|option|optgroup|label|textarea|pre|body)\b/';
   $res = [];
   foreach ($out as $i => $x) {
     $prevBlock = preg_match($block, $out[$i - 1] ?? '<body');
     $nextBlock = preg_match($block, $out[$i + 1] ?? '</body');
     if ($x === 'ws' && ($prevBlock || $nextBlock)) continue;
-    // Blanksteg i början eller slutet av text intill ett blockelement syns inte (utom i pre/textarea).
+    // Whitespace at the start or end of text next to a block element is not visible (except in pre/textarea).
     if (str_starts_with($x, 'text:') && !preg_match('/^<(pre|textarea)\b/', $out[$i - 1] ?? '')) {
       $t = json_decode(substr($x, 5));
       if ($prevBlock) $t = ltrim($t, ' ');
@@ -103,22 +103,22 @@ function tree(string $html): array {
 $fail = 0;
 foreach (array_slice($argv, 1) as $dir) {
   $dir = rtrim($dir, '/');
-  if (!file_exists("$dir/expected.twig")) { echo "-    $dir (ingen expected.twig)\n"; continue; }
+  if (!file_exists("$dir/expected.twig")) { echo "-    $dir (no expected.twig)\n"; continue; }
   $msgs = [];
   foreach ([true, false] as $flag) {
     $l = new AnyLoader(); $l->t = ['in' => file_get_contents("$dir/input.twig"), 'ex' => file_get_contents("$dir/expected.twig")];
     try {
       $ra = env($l)->render('in', context($flag)); $rb = env($l)->render('ex', context($flag));
-      // HTML-tolkaren accepterar ihopklistrade attribut (class="a"style="b"), så de räknas för sig.
+      // The HTML parser accepts glued attributes (class="a"style="b"), so they are counted separately.
       $glued = fn($h) => preg_match_all('/="[^"]*"[a-zA-Z]/', $h);
-      if ($glued($rb) > $glued($ra)) $msgs[] = 'ihopklistrade attribut (flag=' . ($flag ? 'true' : 'false') . ')';
+      if ($glued($rb) > $glued($ra)) $msgs[] = 'glued attributes (flag=' . ($flag ? 'true' : 'false') . ')';
       $a = tree($ra);
       $b = tree($rb);
-    } catch (\Throwable $e) { $msgs[] = 'renderfel: ' . $e->getMessage(); continue; }
+    } catch (\Throwable $e) { $msgs[] = 'render error: ' . $e->getMessage(); continue; }
     if ($a !== $b) {
       $diff = array_diff_assoc($a, $b) + array_diff_assoc($b, $a);
       $k = array_key_first($diff);
-      $msgs[] = 'skiljer (flag=' . ($flag ? 'true' : 'false') . ") vid nod $k: input=" . ($a[$k] ?? '∅') . ' expected=' . ($b[$k] ?? '∅');
+      $msgs[] = 'differs (flag=' . ($flag ? 'true' : 'false') . ") at node $k: input=" . ($a[$k] ?? '∅') . ' expected=' . ($b[$k] ?? '∅');
     }
   }
   if ($msgs) { $fail++; echo "FAIL $dir\n     " . implode("\n     ", $msgs) . "\n"; } else echo "OK   $dir\n";

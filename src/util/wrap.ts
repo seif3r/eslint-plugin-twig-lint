@@ -1,14 +1,21 @@
-// Radbrytning: `attribute-wrap` (öppningstaggar längre än printWidth) och `expression-wrap`
-// (Twig-uttryck längre än printWidth, regel A–D i test/README.md).
+// Line wrapping, for the rules `attribute-wrap` (opening tags longer than printWidth) and `expression-wrap`
+// (Twig expressions longer than printWidth, rules A–D in test/README.md).
 //
-// Reglerna bestämmer bara var raderna bryts. Indenteringsregeln, som körs efteråt, sätter den
-// slutliga indenteringen, så att resultatet alltid följer samma indenteringsmodell.
+// These rules only decide where lines break. The indentation rules set the final indentation in the
+// next fix pass, so the result always follows the same indentation model.
 
-import type { Segment, Token } from '../lexer.ts';
-import type { HtmlTag } from '../html.ts';
-import type { BlockPair, Doc } from '../parse.ts';
-import type { RawFinding, Rule } from '../rule.ts';
-import { computeIndents, indentString } from './indentation.ts';
+import type { Segment, Token } from '../language/lexer.ts';
+import type { HtmlTag } from '../language/html.ts';
+import type { BlockPair, Doc } from '../language/parse.ts';
+import { computeIndents, indentString } from './indent.ts';
+import type { Edit, SharedSettings } from './rule.ts';
+
+export interface WrapProblem {
+  pos: number;
+  /** Taggnamnet (attribute-wrap). */
+  name?: string;
+  edit: Edit;
+}
 
 const BLOCK_ELEMENTS = new Set([
   'address', 'article', 'aside', 'blockquote', 'details', 'dialog', 'dd', 'div', 'dl', 'dt', 'fieldset',
@@ -23,14 +30,14 @@ interface Ctx {
   useTabs: boolean;
 }
 
-/** Bygger ersättningstext av rader med relativa nivåer. Första raden får ingen indentering. */
+/** Builds replacement text from lines with relative levels. The first line gets no indentation. */
 function render(ctx: Ctx, baseCol: number, lines: Array<[number, string]>): string {
   return lines
     .map(([level, text], i) => (i === 0 ? text : indentString(baseCol + level * ctx.unit, ctx.unit, ctx.useTabs) + text))
     .join('\n');
 }
 
-/** Kolumn för raden där `pos` ligger, och om `pos` är första tecknet (utom blanksteg) på raden. */
+/** Column of the line containing `pos`, and whether `pos` is the first non-whitespace character on it. */
 function lineInfo(ctx: Ctx, pos: number): { col: number; atStart: boolean; li: number } {
   const li = ctx.doc.lineOf(pos);
   const line = ctx.doc.lines[li]!;
@@ -73,8 +80,8 @@ function attributeItems(doc: Doc, tag: HtmlTag, from: number, to: number): AttrI
     }
     while (i < to && !/\s/.test(masked[i]!)) {
       if (i > start && blockOpener(i)) break;
-      // `rel="prev"{{ attrs }}`: utskriften är ett eget attribut även utan mellanslag före. Då blir resultatet
-      // detsamma oavsett om attribute-spacing har körts först (ESLint kör alla regler på samma text).
+      // `rel="prev"{{ attrs }}`: the output is its own attribute even without a space before it. That way the
+      // result is the same whether or not attribute-spacing ran first (ESLint runs all rules on the same text).
       const out = doc.segmentAt(i);
       if (i > start && out && out.kind === 'output' && out.start === i && out.open === '{{') break;
       const value = tag.attrValues.find((v) => v.start === i);
@@ -98,7 +105,7 @@ function hasWhitespaceControl(pair: BlockPair): boolean {
   return pair.tags.some((t) => /[-~]/.test(t.open.slice(2)) || /^[-~]/.test(t.close));
 }
 
-/** Rader (med nivå relativt taggen) för attributen. */
+/** Lines (with level relative to the tag) for the attributes. */
 function attributeLines(doc: Doc, tag: HtmlTag, items: AttrItem[], level: number): Array<[number, string]> {
   const out: Array<[number, string]> = [];
   for (const item of items) {
@@ -117,63 +124,54 @@ function attributeLines(doc: Doc, tag: HtmlTag, items: AttrItem[], level: number
   return out;
 }
 
-export const attributeWrap: Rule = {
-  rules: [{ id: 'attribute-wrap', description: 'Ett attribut per rad när öppningstaggen är längre än printWidth', defaultLevel: 'error', fixable: true }],
-  run({ doc, options }) {
-    if (options.attributeWrap !== 'auto') return [];
-    const ctx: Ctx = { doc, cols: computeIndents(doc, options.indentSize), unit: options.indentSize, useTabs: options.useTabs };
-    const out: RawFinding[] = [];
-    for (const tag of doc.htmlTags) {
-      if (tag.closing || !sameLine(doc, tag.start, tag.end)) continue;
-      const li = doc.lineOf(tag.start);
-      const line = doc.lines[li]!;
-      if (doc.isFrozenLine(line.start)) continue;
-      const first = line.start + /^[ \t]*/.exec(doc.src.slice(line.start, line.end))![0].length;
-      const col = ctx.cols[li] ?? 0;
-      if (col + (tag.end - first) <= options.printWidth) continue;
-      const items = attributeItems(doc, tag, tag.nameEnd, tag.closeStart);
-      if (!items.length) continue;
+export function attributeWrapProblems(doc: Doc, settings: SharedSettings): WrapProblem[] {
+  const ctx: Ctx = { doc, cols: computeIndents(doc, settings.indentSize), unit: settings.indentSize, useTabs: settings.useTabs };
+  const out: WrapProblem[] = [];
+  for (const tag of doc.htmlTags) {
+    if (tag.closing || !sameLine(doc, tag.start, tag.end)) continue;
+    const li = doc.lineOf(tag.start);
+    const line = doc.lines[li]!;
+    if (doc.isFrozenLine(line.start)) continue;
+    const first = line.start + /^[ \t]*/.exec(doc.src.slice(line.start, line.end))![0].length;
+    const col = ctx.cols[li] ?? 0;
+    if (col + (tag.end - first) <= settings.printWidth) continue;
+    const items = attributeItems(doc, tag, tag.nameEnd, tag.closeStart);
+    if (!items.length) continue;
 
-      const lines: Array<[number, string]> = [[0, doc.src.slice(tag.start, tag.nameEnd)]];
-      lines.push(...attributeLines(doc, tag, items, 1));
-      const closer = doc.src.slice(tag.closeStart, tag.end);
-      let end = tag.end;
-      const rest = doc.src.slice(tag.end, line.end);
-      const element = doc.elements.find(([o]) => o === tag);
-      if (rest.trim() && BLOCK_ELEMENTS.has(tag.name) && !tag.selfClosing) {
-        const close = element?.[1];
-        if (close && sameLine(doc, close.start, tag.end)) {
-          const content = doc.src.slice(tag.end, close.start).trim();
-          if (content) {
-            lines.push([0, closer], [1, content], [0, doc.src.slice(close.start, close.end)]);
-            end = close.end;
-          } else {
-            lines.push([0, closer]);
-          }
+    const lines: Array<[number, string]> = [[0, doc.src.slice(tag.start, tag.nameEnd)]];
+    lines.push(...attributeLines(doc, tag, items, 1));
+    const closer = doc.src.slice(tag.closeStart, tag.end);
+    let end = tag.end;
+    const rest = doc.src.slice(tag.end, line.end);
+    const element = doc.elements.find(([o]) => o === tag);
+    if (rest.trim() && BLOCK_ELEMENTS.has(tag.name) && !tag.selfClosing) {
+      const close = element?.[1];
+      if (close && sameLine(doc, close.start, tag.end)) {
+        const content = doc.src.slice(tag.end, close.start).trim();
+        if (content) {
+          lines.push([0, closer], [1, content], [0, doc.src.slice(close.start, close.end)]);
+          end = close.end;
         } else {
-          lines.push([0, closer], [1, rest.trim()]);
-          end = line.end;
+          lines.push([0, closer]);
         }
       } else {
-        lines.push([0, closer]);
+        lines.push([0, closer], [1, rest.trim()]);
+        end = line.end;
       }
-      out.push({
-        ruleId: 'attribute-wrap',
-        pos: tag.start,
-        message: `Öppningstaggen <${tag.name}> är längre än ${options.printWidth} tecken: ett attribut per rad`,
-        edits: [{ start: tag.start, end, text: render(ctx, col, lines) }],
-      });
+    } else {
+      lines.push([0, closer]);
     }
-    return out;
-  },
-};
+    out.push({ pos: tag.start, name: tag.name, edit: { start: tag.start, end, text: render(ctx, col, lines) } });
+  }
+  return out;
+}
 
 // ---------------------------------------------------------------------------------------------
 // expression-wrap
 
 const isOpenBracket = (t: Token | undefined): boolean => t !== undefined && t.type === 'punctuation' && '([{'.includes(t.value);
 
-/** Index (inom [from, to]) för token på toppnivå, dvs. inte inuti parenteser. */
+/** Indexes (within [from, to]) of top-level tokens, i.e. not inside brackets. */
 function topLevel(tokens: Token[], from: number, to: number): number[] {
   const out: number[] = [];
   for (let k = from; k <= to; k++) {
@@ -184,7 +182,7 @@ function topLevel(tokens: Token[], from: number, to: number): number[] {
   return out;
 }
 
-/** Delar [from, to] vid kommatecken på toppnivå. Ett avslutande komma ger ingen tom del. */
+/** Splits [from, to] at top-level commas. A trailing comma does not produce an empty part. */
 function splitCommas(tokens: Token[], from: number, to: number): Array<[number, number]> {
   const parts: Array<[number, number]> = [];
   let a = from;
@@ -213,7 +211,7 @@ function hasTopLevel(tokens: Token[], from: number, to: number, values: Set<stri
   });
 }
 
-/** Bryter ett anrop `callee(args)` vars stängande parentes är `close`. Null om det inte går. */
+/** Breaks a call `callee(args)` whose closing parenthesis is `close`. Null if that is not possible. */
 function wrapCall(src: string, seg: Segment, close: number): Array<[number, string]> | null {
   const tokens = seg.tokens;
   const closeTok = tokens[close];
@@ -223,7 +221,7 @@ function wrapCall(src: string, seg: Segment, close: number): Array<[number, stri
   if (close === open + 1) return null;
   const args = splitCommas(tokens, open + 1, close - 1);
 
-  // A: map/array som argument kramas.
+  // A: a map/array argument is hugged.
   const hug = args.find(([a, b]) => isOpenBracket(tokens[a]) && tokens[a]!.value !== '(' && tokens[a]!.match === b && b > a + 1);
   if (hug) {
     const [a, b] = hug;
@@ -232,7 +230,7 @@ function wrapCall(src: string, seg: Segment, close: number): Array<[number, stri
     lines.push([0, src.slice(tokens[b]!.start, seg.end)]);
     return lines;
   }
-  // B1/D: ett argument per rad, avslutande komma.
+  // B1/D: one argument per line, with a trailing comma.
   const lines: Array<[number, string]> = [[0, src.slice(seg.start, tokens[open]!.end)]];
   for (const [x, y] of args) lines.push([1, `${text(src, tokens, x, y)},`]);
   lines.push([0, src.slice(tokens[close]!.start, seg.end)]);
@@ -251,13 +249,13 @@ function wrapSet(src: string, seg: Segment, width: number, col: number): Array<[
     const lines = wrapCall(src, seg, to);
     if (lines && col + lines[0]![1].length <= width) return lines;
   }
-  // B2: bryt efter `=`, `%}` på egen rad.
+  // B2: break after `=`, with `%}` on its own line.
   const lines: Array<[number, string]> = [[0, src.slice(seg.start, eq.end)]];
   const top = topLevel(tokens, from, to);
   const q = top.find((k) => tokens[k]!.value === '?' && tokens[k]!.type === 'punctuation');
   const c = q === undefined ? undefined : top.find((k) => k > q && tokens[k]!.value === ':');
   if (q !== undefined && c !== undefined && q > from && c > q + 1 && c < to) {
-    // B3: ternary bryts alltid.
+    // B3: a ternary is always broken.
     lines.push([1, text(src, tokens, from, q - 1)]);
     lines.push([2, `? ${text(src, tokens, q + 1, c - 1)}`]);
     lines.push([2, `: ${text(src, tokens, c + 1, to)}`]);
@@ -268,7 +266,7 @@ function wrapSet(src: string, seg: Segment, width: number, col: number): Array<[
   return lines;
 }
 
-/** C: `{% if a or (b and c) %}` bryts vid operatorn med lägst prioritet på toppnivå. */
+/** C: `{% if a or (b and c) %}` is broken at the lowest-precedence operator at the top level. */
 function wrapIf(src: string, seg: Segment): Array<[number, string]> | null {
   const tokens = seg.tokens;
   const from = 1;
@@ -289,8 +287,8 @@ function splitLogic(tokens: Token[], from: number, to: number): { ops: number[] 
 }
 
 /**
- * Skriver villkoret [from, to] som rader. Första operanden hamnar efter `prefix` på nivån `level`,
- * operatorerna på egna rader på nivån `opLevel`.
+ * Writes the condition [from, to] as lines. The first operand goes after `prefix` at level `level`,
+ * and the operators go on their own lines at level `opLevel`.
  */
 function conditionLines(
   src: string, tokens: Token[], from: number, to: number, level: number, opLevel: number, prefix: string,
@@ -322,7 +320,7 @@ function wrapOutput(src: string, seg: Segment): Array<[number, string]> | null {
   const last = tokens.length - 1;
   if (last < 2 || tokens[last]!.value !== ')') return null;
   const open = tokens.findIndex((t) => t.match === last);
-  // Bara ett rent anrop: callee-kedja av namn och punkter före parentesen.
+  // Only a plain call: a callee chain of names and dots before the parenthesis.
   for (let k = 0; k < open; k++) {
     const t = tokens[k]!;
     if (!(t.type === 'name' || (t.type === 'punctuation' && t.value === '.'))) return null;
@@ -330,30 +328,22 @@ function wrapOutput(src: string, seg: Segment): Array<[number, string]> | null {
   return wrapCall(src, seg, last);
 }
 
-export const expressionWrap: Rule = {
-  rules: [{ id: 'expression-wrap', description: 'Bryt Twig-uttryck som är längre än printWidth', defaultLevel: 'error', fixable: true }],
-  run({ doc, options }) {
-    const ctx: Ctx = { doc, cols: computeIndents(doc, options.indentSize), unit: options.indentSize, useTabs: options.useTabs };
-    const out: RawFinding[] = [];
-    for (const seg of doc.segments) {
-      if (seg.kind !== 'output' && seg.kind !== 'block') continue;
-      if (!sameLine(doc, seg.start, seg.end)) continue;
-      const info = lineInfo(ctx, seg.start);
-      const line = doc.lines[info.li]!;
-      if (!info.atStart || doc.src.slice(seg.end, line.end).trim() !== '' || doc.isFrozenLine(line.start)) continue;
-      if (info.col + (seg.end - seg.start) <= options.printWidth) continue;
-      let lines: Array<[number, string]> | null = null;
-      if (seg.kind === 'block' && seg.tag === 'set') lines = wrapSet(doc.src, seg, options.printWidth, info.col);
-      else if (seg.kind === 'block' && (seg.tag === 'if' || seg.tag === 'elseif')) lines = wrapIf(doc.src, seg);
-      else if (seg.kind === 'output') lines = wrapOutput(doc.src, seg);
-      if (!lines || lines.length < 2) continue;
-      out.push({
-        ruleId: 'expression-wrap',
-        pos: seg.start,
-        message: `Uttrycket är längre än ${options.printWidth} tecken`,
-        edits: [{ start: seg.start, end: seg.end, text: render(ctx, info.col, lines) }],
-      });
-    }
-    return out;
-  },
-};
+export function expressionWrapProblems(doc: Doc, settings: SharedSettings): WrapProblem[] {
+  const ctx: Ctx = { doc, cols: computeIndents(doc, settings.indentSize), unit: settings.indentSize, useTabs: settings.useTabs };
+  const out: WrapProblem[] = [];
+  for (const seg of doc.segments) {
+    if (seg.kind !== 'output' && seg.kind !== 'block') continue;
+    if (!sameLine(doc, seg.start, seg.end)) continue;
+    const info = lineInfo(ctx, seg.start);
+    const line = doc.lines[info.li]!;
+    if (!info.atStart || doc.src.slice(seg.end, line.end).trim() !== '' || doc.isFrozenLine(line.start)) continue;
+    if (info.col + (seg.end - seg.start) <= settings.printWidth) continue;
+    let lines: Array<[number, string]> | null = null;
+    if (seg.kind === 'block' && seg.tag === 'set') lines = wrapSet(doc.src, seg, settings.printWidth, info.col);
+    else if (seg.kind === 'block' && (seg.tag === 'if' || seg.tag === 'elseif')) lines = wrapIf(doc.src, seg);
+    else if (seg.kind === 'output') lines = wrapOutput(doc.src, seg);
+    if (!lines || lines.length < 2) continue;
+    out.push({ pos: seg.start, edit: { start: seg.start, end: seg.end, text: render(ctx, info.col, lines) } });
+  }
+  return out;
+}

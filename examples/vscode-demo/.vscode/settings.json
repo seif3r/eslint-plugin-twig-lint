@@ -1,5 +1,5 @@
 {
-  // Kör ESLint-servern med Node från PATH (>= 22.18), som kan läsa pluginets .ts-filer direkt.
+  // Run the ESLint server with Node from PATH (>= 22.18), which can load the plugin's .ts files directly.
   "eslint.runtime": "node",
   "eslint.validate": ["twig", "html.twig"],
   "eslint.format.enable": true,

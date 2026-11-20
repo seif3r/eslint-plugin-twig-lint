@@ -1,20 +1,50 @@
 {
-  "name": "twig-code-formatter-monorepo",
-  "private": true,
+  "name": "eslint-plugin-twig-lint",
+  "version": "0.1.0",
+  "description": "ESLint plugin that lints and formats Twig templates: indentation, line wrapping and spacing.",
+  "keywords": [
+    "eslint",
+    "eslintplugin",
+    "eslint-plugin",
+    "twig",
+    "drupal",
+    "formatter",
+    "lint"
+  ],
+  "license": "MIT",
+  "author": "Anders Niemi Brundin",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seif3r/twig-code-formatter.git"
+  },
   "type": "module",
-  "workspaces": [
-    "packages/*"
+  "engines": {
+    "node": ">=20.19"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
   ],
   "scripts": {
-    "build": "npm run build -w twig-code-formatter",
-    "typecheck": "tsc -p packages/core --noEmit",
-    "test": "npm test -w twig-code-formatter",
-    "golden": "node test/run.mjs --cmd \"node --disable-warning=ExperimentalWarning $PWD/packages/core/src/cli.ts lint --fix --quiet {file}\"",
-    "golden:eslint": "node test/run.mjs --cmd \"node --disable-warning=ExperimentalWarning $PWD/packages/eslint-plugin-twig-lint/test/eslint-fix.ts {file}\""
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --disable-warning=ExperimentalWarning --test test/*.test.ts",
+    "golden": "node test/run.mjs --cmd \"node --disable-warning=ExperimentalWarning $PWD/test/eslint-fix.ts {file}\"",
+    "prepublishOnly": "npm run typecheck && npm test && npm run build"
+  },
+  "peerDependencies": {
+    "eslint": ">=9.15.0"
+  },
+  "dependencies": {
+    "@eslint/plugin-kit": "^0.7.3"
   },
   "devDependencies": {
     "@eslint/core": "^1.2.1",
-    "@eslint/css": "^2.0.1",
     "@types/node": "^24.0.0",
     "eslint": "^10.15.0",
     "typescript": "^5.8.0"

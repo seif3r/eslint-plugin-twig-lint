@@ -1,6 +1,6 @@
-// Bygger en dokumentmodell av en mall: segment, HTML-taggar, blockpar och "ramar".
-// En ram (Frame) är ett område som indenterar sitt innehåll: ett Twig-block, ett HTML-element,
-// en parentes, en Twig-avgränsare som bryts över flera rader eller en öppningstagg som bryts.
+// Builds a document model of a template: segments, HTML tags, block pairs and frames.
+// A frame is a region that indents its content: a Twig block, an HTML element, a bracket,
+// a Twig delimiter that spans several lines, or an opening tag that is broken over several lines.
 
 import { lex, lineAt, TwigParseError, type Segment, type Token } from './lexer.ts';
 import { maskTwig, scanHtml, type HtmlTag, type Range } from './html.ts';
@@ -15,18 +15,18 @@ export type FrameKind = 'delim' | 'bracket' | 'block' | 'element' | 'tag' | 'vir
 
 export interface Frame {
   kind: FrameKind;
-  /** Innehållet börjar efter den här positionen. */
+  /** The content starts after this position. */
   open: number;
-  /** Position för det som stänger ramen. En rad som börjar här får ankarradens indentering. */
+  /** Position of whatever closes the frame. A line that starts here gets the anchor line's indentation. */
   close: number;
-  /** Position på raden som ramens indentering räknas från. */
+  /** Position on the line that the frame's indentation is counted from. */
   anchor: number;
   seg?: Segment;
 }
 
 export interface BlockPair {
   name: string;
-  /** Öppningstagg, eventuella mellantaggar (else/elseif/plural) och sluttagg. */
+  /** Opening tag, any middle tags (else/elseif/plural) and end tag. */
   tags: Segment[];
   parent: BlockPair | null;
 }
@@ -37,13 +37,13 @@ export interface Doc {
   lines: Line[];
   masked: string;
   htmlTags: HtmlTag[];
-  /** Matchade HTML-element (öppning, stängning). */
+  /** Matched HTML elements (opening, closing). */
   elements: Array<[HtmlTag, HtmlTag]>;
   blocks: BlockPair[];
   frames: Frame[];
-  /** Områden där radernas indentering inte rörs. */
+  /** Regions where line indentation is never touched. */
   frozen: Range[];
-  /** Områden där blanksteg är betydelsefulla (pre, strängar, attributvärden …). */
+  /** Regions where whitespace is significant (pre, strings, attribute values …). */
   preserved: Range[];
   lineOf(pos: number): number;
   segmentAt(pos: number): Segment | undefined;
@@ -197,11 +197,11 @@ function pairBlocks(src: string, segments: Segment[]): BlockPair[] {
     if (s.tag.startsWith('end') && s.tag.length > 3) {
       const name = s.tag.slice(3);
       if (!top) {
-        throw new TwigParseError(`{% ${s.tag} %} på rad ${lineAt(src, s.start)} har inget {% ${name} %}`, s.start);
+        throw new TwigParseError(`{% ${s.tag} %} on line ${lineAt(src, s.start)} has no matching {% ${name} %}`, s.start);
       }
       if (top.name !== name) {
         throw new TwigParseError(
-          `{% ${s.tag} %} på rad ${lineAt(src, s.start)} matchar inte {% ${top.name} %} på rad ${lineAt(src, top.tags[0]!.start)}`,
+          `{% ${s.tag} %} on line ${lineAt(src, s.start)} does not match {% ${top.name} %} on line ${lineAt(src, top.tags[0]!.start)}`,
           s.start,
         );
       }
@@ -212,7 +212,7 @@ function pairBlocks(src: string, segments: Segment[]): BlockPair[] {
     const parents = MIDDLE[s.tag];
     if (parents) {
       if (!top || !parents.includes(top.name)) {
-        throw new TwigParseError(`{% ${s.tag} %} på rad ${lineAt(src, s.start)} står utanför ${parents.map((p) => `{% ${p} %}`).join('/')}`, s.start);
+        throw new TwigParseError(`{% ${s.tag} %} on line ${lineAt(src, s.start)} is outside ${parents.map((p) => `{% ${p} %}`).join('/')}`, s.start);
       }
       top.tags.push(s);
       continue;
@@ -227,14 +227,14 @@ function pairBlocks(src: string, segments: Segment[]): BlockPair[] {
   if (open) {
     const last = stack[stack.length - 1]!;
     throw new TwigParseError(
-      `{% ${last.name} %} på rad ${lineAt(src, last.tags[0]!.start)} saknar {% end${last.name} %}`,
+      `{% ${last.name} %} on line ${lineAt(src, last.tags[0]!.start)} has no {% end${last.name} %}`,
       last.tags[0]!.start,
     );
   }
   return pairs;
 }
 
-/** Paret HTML-taggar inom samma Twig-gren. Taggar som öppnas i en gren och stängs i en annan paras inte. */
+/** Pairs HTML tags within the same Twig branch. Tags opened in one branch and closed in another are not paired. */
 function pairElements(tags: HtmlTag[], blocks: BlockPair[]): Array<[HtmlTag, HtmlTag]> {
   type Ev = { pos: number; kind: 'push' | 'pop' | 'open' | 'close'; tag?: HtmlTag };
   const events: Ev[] = [];
@@ -274,8 +274,8 @@ function pairElements(tags: HtmlTag[], blocks: BlockPair[]): Array<[HtmlTag, Htm
 }
 
 /**
- * Två syskonblock {% if %} där det första bara innehåller en öppningstagg och det andra bara den
- * matchande stängningstaggen: allt mellan blocken indenteras ett steg.
+ * Two sibling {% if %} blocks where the first contains only an opening tag and the second only the
+ * matching closing tag: everything between the blocks is indented one step.
  */
 function conditionalPairs(src: string, blocks: BlockPair[], tags: HtmlTag[]): Frame[] {
   const frames: Frame[] = [];

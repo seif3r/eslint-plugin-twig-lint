@@ -8,11 +8,11 @@
     "verbatimModuleSyntax": true,
     "strict": true,
     "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
     "declaration": true,
-    "outDir": "dist",
-    "rootDir": "src",
     "types": ["node"],
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "noEmit": true
   },
-  "include": ["src"]
+  "include": ["src", "test/*.ts"]
 }
