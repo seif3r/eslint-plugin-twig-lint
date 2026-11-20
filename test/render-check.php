@@ -58,6 +58,8 @@ function context(bool $flag): array {
     'media_type' => 'img', 'media' => '<img src="x">', 'caption' => 'Cap', 'code' => 'c', 'content' => 'Body',
     'program_url' => '/p', 'heading_id' => 'h', 'sidebar' => 'Side', 'body' => 'Body',
     'page' => ['title' => 'T', 'lead' => 'Lead'], 'placeholder' => $v, 'disabled' => $flag, 'tabs' => [$item],
+    'tags' => [['visible' => true, 'label' => 'news'], ['visible' => $flag, 'label' => 'events'], ['visible' => false, 'label' => 'x']],
+    'total_items' => 3, 'search_terms' => ['twig', 'lint'],
     'attributes' => $attrs('a'), 'wrapper_attributes' => $attrs('w'), 'title_attributes' => $attrs('t'),
   ];
 }

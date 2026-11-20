@@ -19,7 +19,11 @@ is used depends on the expression:
 - **C. `{% if %}` and `{% elseif %}`** break at the lowest-precedence operator (`or` before `and`) at the top
   level. The first condition stays on the `{% if` line. A parenthesized group with `and`/`or` is always broken
   too. `%}` goes on its own line.
-- **D. A plain function or macro call** gets one argument per line with a trailing comma.
+- **D. Other output tags (`{{ … }}`)**
+  1. A filter chain (a value followed by `|filter` steps) breaks before each `|`, one step in, with `}}`
+     on the last line. This only applies when the whole expression is the chain: in `a ~ b|upper` or a
+     ternary, breaking at `|` would misrepresent precedence, so those are left alone.
+  2. A plain function or macro call gets one argument per line with a trailing comma.
 
 Strings are never broken, and parentheses are never added or removed. If none of the above applies, the line
 is left long. Tags that already span several lines are not touched.
@@ -48,6 +52,10 @@ is left long. Tags that already span several lines are not touched.
 
 ```twig
 {{ macros.card_list(page.title ? page.title : 'Untitled', page.items, page.layout) }}
+```
+
+```twig
+{{ items|filter(item => item.visible)|map(item => item.title)|join(', ')|default('No items') }}
 ```
 
 ### ✅ Correct
@@ -91,6 +99,14 @@ is left long. Tags that already span several lines are not touched.
   page.items,
   page.layout,
 ) }}
+```
+
+```twig
+{{ items
+  |filter(item => item.visible)
+  |map(item => item.title)
+  |join(', ')
+  |default('No items') }}
 ```
 
 ## Options

@@ -315,9 +315,54 @@ function operandLines(src: string, tokens: Token[], a: number, b: number, level:
   out.push([level, lead + text(src, tokens, a, b)]);
 }
 
+const isPunct = (t: Token | undefined, values: string): boolean =>
+  t !== undefined && (t.type === 'punctuation' || t.type === 'operator') && values.split(' ').includes(t.value);
+
+/**
+ * Index of every top-level `|` if [0, last] is a plain filter chain: a value (name, literal, call,
+ * subscript or attribute access) followed by `|filter` or `|filter(args)` steps. Null for anything else,
+ * e.g. when the chain is part of `a ~ b|upper`, a ternary or `and`/`or`, where breaking at `|` would
+ * misrepresent precedence.
+ */
+function filterChain(tokens: Token[], last: number): number[] | null {
+  const top = topLevel(tokens, 0, last);
+  const pipes: number[] = [];
+  let prev: Token | undefined;
+  for (const k of top) {
+    const t = tokens[k]!;
+    const afterLink = isPunct(prev, '. | ?.');
+    const afterValue = prev !== undefined && !afterLink;
+    let ok: boolean;
+    if (prev === undefined) ok = t.type !== 'operator' && !isPunct(t, '. | ?. , : ?');
+    else if (t.type === 'name') ok = afterLink;
+    else if (isPunct(t, '. ?.')) ok = afterValue;
+    else if (isPunct(t, '|')) ok = afterValue;
+    else if (isPunct(t, '( [')) ok = afterValue;
+    else if (isPunct(t, ') ] }')) ok = true;
+    else ok = false;
+    if (!ok) return null;
+    if (isPunct(t, '|')) pipes.push(k);
+    prev = t;
+  }
+  return pipes.length && pipes[0]! > 0 ? pipes : null;
+}
+
 function wrapOutput(src: string, seg: Segment): Array<[number, string]> | null {
   const tokens = seg.tokens;
   const last = tokens.length - 1;
+  if (last < 0) return null;
+  // D, first step: break a filter chain before each `|`. The closing `}}` stays on the last line.
+  const pipes = filterChain(tokens, last);
+  if (pipes) {
+    const lines: Array<[number, string]> = [[0, src.slice(seg.start, tokens[pipes[0]! - 1]!.end)]];
+    pipes.forEach((p, i) => {
+      const end = i + 1 < pipes.length ? pipes[i + 1]! - 1 : last;
+      lines.push([1, text(src, tokens, p, end)]);
+    });
+    lines[lines.length - 1]![1] += src.slice(tokens[last]!.end, seg.end);
+    return lines;
+  }
+  // D, second step: one argument per line for a plain call.
   if (last < 2 || tokens[last]!.value !== ')') return null;
   const open = tokens.findIndex((t) => t.match === last);
   // Only a plain call: a callee chain of names and dots before the parenthesis.

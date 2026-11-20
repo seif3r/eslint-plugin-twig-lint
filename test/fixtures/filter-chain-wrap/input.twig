@@ -1,0 +1,7 @@
+<p class="tags">
+  {{ tags|filter(tag => tag.visible)|map(tag => tag.label|capitalize)|join(', ')|default('No tags') }}
+</p>
+<p class="summary">
+  {{ 'Showing ' ~ items|length ~ ' of ' ~ total_items ~ ' results for ' ~ search_terms|join(' ') }}
+</p>
+{% set visible_items = items|default([])|filter(item => item.visible and not item.hidden_from_listing) %}
