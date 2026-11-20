@@ -7,6 +7,7 @@ import { lineAt, TwigParseError } from './lexer.ts';
 import { parse, type Doc } from './parse.ts';
 import { applyEdits, type Finding, type RawFinding, type Rule, type RuleContext, type RuleMeta } from './rule.ts';
 import { indentation } from './rules/indentation.ts';
+import { attributeWrap, expressionWrap } from './rules/wrap.ts';
 import {
   attributeSpacing, blankLineAfterBlock, delimiterSpacing, emptyLines, finalNewline, trailingWhitespace,
 } from './rules/whitespace.ts';
@@ -15,6 +16,8 @@ import {
 export const RULES: Rule[] = [
   delimiterSpacing,
   attributeSpacing,
+  attributeWrap,
+  expressionWrap,
   indentation,
   trailingWhitespace,
   emptyLines,

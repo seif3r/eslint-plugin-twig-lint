@@ -9,7 +9,7 @@
     "build": "npm run build -w twig-code-formatter",
     "typecheck": "tsc -p packages/core --noEmit",
     "test": "npm test -w twig-code-formatter",
-    "golden": "node test/run.mjs --cmd \"node $PWD/packages/core/src/cli.ts lint --fix --quiet {file}\""
+    "golden": "node test/run.mjs --cmd \"node --disable-warning=ExperimentalWarning $PWD/packages/core/src/cli.ts lint --fix --quiet {file}\""
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
