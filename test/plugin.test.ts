@@ -88,3 +88,9 @@ test('a parse error is a fatal message with line and column', async () => {
   assert.match(messages[0]!.message, /endif/);
   assert.equal(messages[0]!.line, 2);
 });
+
+test('rule option: endblock-name never', async () => {
+  const text = '{% block a %}\n  x\n{% endblock a %}\n\n{% block b %}\n  y\n{% endblock c %}\n';
+  const rules = { 'twig-lint/endblock-name': ['error', { mode: 'never' }] };
+  assert.equal(await fix(text, { rules }), '{% block a %}\n  x\n{% endblock %}\n\n{% block b %}\n  y\n{% endblock %}\n');
+});

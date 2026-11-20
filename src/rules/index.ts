@@ -4,6 +4,7 @@ import blankLineAfterBlock from './blank-line-after-block.ts';
 import blockIndent from './block-indent.ts';
 import delimiterSpacing from './delimiter-spacing.ts';
 import emptyLines from './empty-lines.ts';
+import endblockName from './endblock-name.ts';
 import expressionWrap from './expression-wrap.ts';
 import finalNewline from './final-newline.ts';
 import nestedIndent from './nested-indent.ts';
@@ -16,6 +17,7 @@ export const rules = {
   'block-indent': blockIndent,
   'delimiter-spacing': delimiterSpacing,
   'empty-lines': emptyLines,
+  'endblock-name': endblockName,
   'expression-wrap': expressionWrap,
   'final-newline': finalNewline,
   'nested-indent': nestedIndent,
