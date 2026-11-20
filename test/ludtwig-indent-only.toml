@@ -1,5 +1,0 @@
-version = "0.15.0"
-[general]
-active-rules = ["indentation"]
-[format]
-indentation-count = 2

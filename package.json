@@ -34,7 +34,6 @@
     "build": "rm -rf dist && tsc -p tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "node --disable-warning=ExperimentalWarning --test test/*.test.ts",
-    "golden": "node test/run.mjs --cmd \"node --disable-warning=ExperimentalWarning $PWD/test/eslint-fix.ts {file}\"",
     "prepublishOnly": "npm run typecheck && npm test && npm run build"
   },
   "peerDependencies": {

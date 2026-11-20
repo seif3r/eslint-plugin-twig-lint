@@ -143,10 +143,9 @@ The language id depends on which Twig extension you use. Check the language mode
 
 ```bash
 npm install
-npm test                  # golden fixtures and plugin tests via ESLint's API
-npm run golden -- --diff  # the same fixtures via eslint --fix, with diffs
+npm test           # golden fixtures and plugin tests via ESLint's API
 npm run typecheck
-npm run build             # compiles to dist/
+npm run build      # compiles to dist/
 ```
 
 The source is TypeScript that Node runs directly (type stripping, Node 22.18+). The published package
