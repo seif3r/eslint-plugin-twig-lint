@@ -1,0 +1,13 @@
+{% extends 'node.html.twig' %}
+
+{% set heading_attributes = create_attribute({
+  class: [
+    'teaser__heading',
+  ],
+}, title_attributes) %}
+
+{% block heading %}
+  <h2 {{ heading_attributes }}>
+    {{ label }}
+  </h2>
+{% endblock heading %}

@@ -1,0 +1,52 @@
+{#
+/**
+ * @file
+ * Example template for a previous/next pager.
+ *
+ * Available variables:
+ * - heading_id: ID of the pager heading.
+ * - pager: Previous, current and next page.
+ */
+#}
+{% if pager.prev or pager.next %}
+  <nav class="pager" role="navigation" aria-labelledby="{{ heading_id }}">
+    <h4 id="{{ heading_id }}" class="pager__title visually-hidden">{{ 'Pagination'|t }}</h4>
+    <ul class="pager__list">
+      {% if pager.prev %}
+        <li class="pager__item pager__item--prev">
+          <a
+            href="{{ pager.prev.href }}"
+            title="{{ 'Previous page'|t }}"
+            rel="prev"
+            {{ pager.prev.attributes|without('href', 'rel') }}
+          >
+            <span class="visually-hidden">{{ 'Previous page'|t }}</span>
+            <span aria-hidden="true">{{ pager.prev.text|default('‹ Previous'|t) }}</span>
+          </a>
+        </li>
+      {% endif %}
+
+      {% if pager.current %}
+        <li class="pager__item pager__item--current">
+          {% trans %}
+            Page {{ pager.current }}
+          {% endtrans %}
+        </li>
+      {% endif %}
+
+      {% if pager.next %}
+        <li class="pager__item pager__item--next">
+          <a
+            href="{{ pager.next.href }}"
+            title="{{ 'Next page'|t }}"
+            rel="next"
+            {{ pager.next.attributes|without('href', 'rel') }}
+          >
+            <span class="visually-hidden">{{ 'Next page'|t }}</span>
+            <span aria-hidden="true">{{ pager.next.text|default('Next ›'|t) }}</span>
+          </a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}

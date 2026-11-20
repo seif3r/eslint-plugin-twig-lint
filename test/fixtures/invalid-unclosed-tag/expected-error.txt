@@ -1,0 +1,2 @@
+`{{ include(...` på rad 4 stängs aldrig, och `{% if %}` saknar `{% endif %}`.
+Förväntat: formattern vägrar, filen lämnas byte för byte orörd och ett fel med radnummer visas.

@@ -1,0 +1,9 @@
+<nav class="tabs" role="tablist">
+  {% for tab in tabs %}
+    {{ include('acme:tab', {
+      text: tab.title,
+      url: tab.url,
+      attributes: tab.attributes,
+    }, with_context: false) }}
+  {% endfor %}
+</nav>

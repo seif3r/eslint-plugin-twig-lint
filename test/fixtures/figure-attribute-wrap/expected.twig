@@ -1,0 +1,19 @@
+{#
+/**
+ * @file
+ * Example template for media with a caption.
+ *
+ * Available variables:
+ * - media: The captioned media.
+ * - media_type: The kind of media, used as a modifier class.
+ * - caption: The caption text.
+ * - modifier: An optional extra class.
+ */
+#}
+<figure
+  role="group"
+  class="media-caption media-caption--{{ media_type }}{%- if modifier %} {{ modifier }}{%- endif %}"
+>
+  {{ media }}
+  <figcaption>{{ caption }}</figcaption>
+</figure>

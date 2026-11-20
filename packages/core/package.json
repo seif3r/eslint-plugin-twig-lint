@@ -1,0 +1,26 @@
+{
+  "name": "twig-code-formatter",
+  "version": "0.1.0",
+  "description": "Formatter and linter for Twig templates, with an optional Drupal preset.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "bin": {
+    "twig-code-formatter": "dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p .",
+    "test": "node --test 'test/**/*.test.ts'"
+  }
+}

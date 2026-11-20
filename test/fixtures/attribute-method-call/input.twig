@@ -1,0 +1,19 @@
+{#
+/**
+ * @file
+ * Example template for a search field.
+ *
+ * Available variables:
+ * - wrapper_attributes: HTML attributes for the wrapper element.
+ * - attributes: HTML attributes for the <input> element.
+ * - placeholder: Placeholder text.
+ */
+#}
+
+<div{{ wrapper_attributes.addClass('search-field') }}>
+  {{ include('acme:search_input', {
+    placeholder: placeholder ? placeholder : 'Search',
+    disabled: disabled ? TRUE : FALSE,
+    attributes: attributes,
+  }, with_context: false) }}
+</div>

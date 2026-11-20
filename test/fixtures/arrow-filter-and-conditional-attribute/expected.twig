@@ -1,0 +1,40 @@
+{% set featured = items|default([])|filter(
+  (item, key) => not (key starts with '#'),
+) %}
+{% set regular = more_items|default([])|filter(
+  (item, key) => not (key starts with '#'),
+) %}
+{% set featured_count = featured|length %}
+{% set regular_count = regular|length %}
+{% set is_mixed = featured_count > 0 and regular_count > 0 %}
+
+{% if featured or regular %}
+  <ul
+    role="list"
+    class="card-grid card-grid--auto{{ is_mixed ? ' card-grid--mixed' : '' }}"
+    {% if is_mixed %}
+      style="--card-grid-featured: {{ featured_count }};"
+    {% endif %}
+  >
+    {% for item in featured %}
+      <li
+        class="card-grid__item card-grid__item--featured"
+        {% if is_mixed %}
+          style="--card-grid-index: {{ loop.index }};"
+        {% endif %}
+      >
+        {{ item }}
+      </li>
+    {% endfor %}
+
+    {% if regular %}
+      <li class="card-grid__rest">
+        <ul role="list" class="card-grid__rest-items">
+          {% for item in regular %}
+            <li class="card-grid__rest-item">{{ item }}</li>
+          {% endfor %}
+        </ul>
+      </li>
+    {% endif %}
+  </ul>
+{% endif %}

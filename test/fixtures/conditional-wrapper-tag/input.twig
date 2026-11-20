@@ -1,0 +1,41 @@
+{% import _self as menu %}
+
+{#
+  Renders a nested menu by calling the macro recursively.
+#}
+{{ menu.menu_links(heading, links, tag) }}
+
+{% macro menu_links(heading = '', links = [], tag = '') %}
+  {% import _self as menu %}
+
+  {% if heading is not empty %}
+    {{ include('acme:heading', {
+      text: heading,
+      level: 3,
+    }, with_context: false) }}
+  {% endif %}
+
+  {% if tag == 'ul' or tag == 'ol' %}
+    <{{ tag == 'ul' ? 'ul' : 'ol' }}>
+    {% endif %}
+
+    {% for link in links %}
+      {% if link.below %}
+        {# A nested menu: call the macro again. #}
+        {{ menu.menu_links(link.title ? link.title : 'Untitled', link.below, link.tag) }}
+      {% elseif link.url %}
+        {{ include('acme:link', {
+            text: link.title,
+            url: link.url,
+          }, with_context: false) }}
+      {% else %}
+        <li>
+          {{ link.title }}
+        </li>
+      {% endif %}
+    {% endfor %}
+
+    {% if tag == 'ul' or tag == 'ol' %}
+    </{{ tag == 'ul' ? 'ul' : 'ol' }}>
+  {% endif %}
+{% endmacro %}

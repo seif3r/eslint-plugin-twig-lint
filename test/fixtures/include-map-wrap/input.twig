@@ -1,0 +1,16 @@
+<main class="page">
+  {% embed 'acme:two_columns' %}
+    {% block sidebar %}
+      {{ sidebar }}
+    {% endblock sidebar %}
+
+    {% block main %}
+      {{ include('acme:page_header', {title: page.title, lead: page.lead}, with_context: false) }}
+
+      {{ include('acme:article_body', {
+    attributes: attributes.addClass('page__body'),
+    body: body,
+  }, with_context: false) }}
+    {% endblock %}
+  {% endembed %}
+</main>

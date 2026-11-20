@@ -1,0 +1,53 @@
+{% set has_choices = choices is defined %}
+{% set heading = field.heading|default(heading|default('Choose')) %}
+{% set visible_choices =
+  has_choices
+    ? choices
+    : field.entries|default(entries|default([]))
+%}
+
+{% set list_attributes = create_attribute({
+  class: [
+    'choice-list',
+  ],
+  role: not has_choices ? 'listbox' : null,
+  'aria-multiselectable': multiple ? 'true' : 'false',
+}, attributes) %}
+
+{% if has_choices
+    or (visible_choices is iterable
+      and visible_choices|length > 0
+    )
+%}
+  {% if not has_choices %}
+    <p id="{{ list_attributes.id }}">
+      {{ heading }}
+    </p>
+  {% endif %}
+
+  {% apply spaceless %}
+    <select {{ list_attributes }}>
+      {% for choice in visible_choices %}
+        {% if choice.group|default(false) %}
+          <optgroup label="{{ choice.label }}">
+            {% for item in choice.items %}
+              <option
+                value="{{ item.value }}"
+                {{ item.checked ? ' selected="selected"' }}
+              >
+                {{ item.label }}
+              </option>
+            {% endfor %}
+          </optgroup>
+        {% else %}
+          <option
+            value="{{ choice.value }}"
+            {{ choice.checked ? ' selected="selected"' }}
+          >
+            {{ choice.label }}
+          </option>
+        {% endif %}
+      {% endfor %}
+    </select>
+  {% endapply %}
+{% endif %}

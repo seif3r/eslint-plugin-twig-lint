@@ -1,0 +1,40 @@
+{#
+  /**
+  * @file
+  * Example template for notices, grouped by type.
+  *
+  * Each group gets a visually hidden heading for assistive technology.
+  *
+  * Available variables:
+  * - notices: Notices to display, grouped by type.
+  * - headings: A heading for each notice type, including:
+  *   - status: Heading for status notices.
+  */
+#}
+<section class="notices">
+  {% block notices %}
+    {% if headings[type] %}
+      <h2 class="visually-hidden">
+        {{ headings[type] }}
+      </h2>
+    {% endif %}
+
+    {% for type, messages in notices %}
+      {% set notice_type = type %}
+      <div role="status" aria-label="{{ headings[type] }}">
+        {% for message in messages %}
+          {% embed 'acme:notice'
+            with {
+              attributes: attributes.addClass('notice--inline'),
+              variant: notice_type,
+            } %}
+            {% block notice_body %}
+              {{ message }}
+            {% endblock %}
+          {% endembed %}
+        {% endfor %}
+      </div>
+    {% endfor %}
+  {% endblock notices %}
+</section>
+<div class="notices-extra"></div>
