@@ -73,6 +73,10 @@ function attributeItems(doc: Doc, tag: HtmlTag, from: number, to: number): AttrI
     }
     while (i < to && !/\s/.test(masked[i]!)) {
       if (i > start && blockOpener(i)) break;
+      // `rel="prev"{{ attrs }}`: utskriften är ett eget attribut även utan mellanslag före. Då blir resultatet
+      // detsamma oavsett om attribute-spacing har körts först (ESLint kör alla regler på samma text).
+      const out = doc.segmentAt(i);
+      if (i > start && out && out.kind === 'output' && out.start === i && out.open === '{{') break;
       const value = tag.attrValues.find((v) => v.start === i);
       if (value) {
         i = value.end;

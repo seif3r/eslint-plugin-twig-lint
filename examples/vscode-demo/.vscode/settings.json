@@ -1,0 +1,12 @@
+{
+  // Kör ESLint-servern med Node från PATH (>= 22.18), som kan läsa pluginets .ts-filer direkt.
+  "eslint.runtime": "node",
+  "eslint.validate": ["twig", "html.twig"],
+  "eslint.format.enable": true,
+  "[twig]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+    "editor.formatOnSave": false,
+    "editor.codeActionsOnSave": { "source.fixAll.eslint": "explicit" }
+  },
+  "twigPlus.format.enable": false
+}

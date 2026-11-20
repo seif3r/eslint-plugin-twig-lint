@@ -1,0 +1,15 @@
+{
+  "name": "eslint-plugin-twig-lint",
+  "version": "0.0.1",
+  "private": true,
+  "description": "ESLint plugin for Twig templates (proof of concept).",
+  "license": "MIT",
+  "type": "module",
+  "exports": "./src/index.ts",
+  "peerDependencies": {
+    "eslint": ">=9.15"
+  },
+  "dependencies": {
+    "@eslint/plugin-kit": "*"
+  }
+}

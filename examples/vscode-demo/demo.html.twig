@@ -1,0 +1,12 @@
+{% set card_attributes = create_attribute({
+    class: [
+        'card',
+      ],
+  }, attributes) %}
+
+<article{{ card_attributes }}>
+  {% if title %}
+  <h2>{{title}}</h2>
+  {% endif %}
+  {{ include('acme:button', {text: 'Read more', url: url, variant: 'secondary'}, with_context: false) }}
+</article>

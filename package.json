@@ -9,10 +9,14 @@
     "build": "npm run build -w twig-code-formatter",
     "typecheck": "tsc -p packages/core --noEmit",
     "test": "npm test -w twig-code-formatter",
-    "golden": "node test/run.mjs --cmd \"node --disable-warning=ExperimentalWarning $PWD/packages/core/src/cli.ts lint --fix --quiet {file}\""
+    "golden": "node test/run.mjs --cmd \"node --disable-warning=ExperimentalWarning $PWD/packages/core/src/cli.ts lint --fix --quiet {file}\"",
+    "golden:eslint": "node test/run.mjs --cmd \"node --disable-warning=ExperimentalWarning $PWD/packages/eslint-plugin-twig-lint/test/eslint-fix.ts {file}\""
   },
   "devDependencies": {
+    "@eslint/core": "^1.2.1",
+    "@eslint/css": "^2.0.1",
     "@types/node": "^24.0.0",
+    "eslint": "^10.15.0",
     "typescript": "^5.8.0"
   }
 }
