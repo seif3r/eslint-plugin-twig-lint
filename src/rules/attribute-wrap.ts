@@ -3,6 +3,7 @@ import { attributeWrapProblems } from '../util/wrap.ts';
 
 /** Opening tags longer than printWidth: one attribute per line and `>` on its own line. */
 export default createRule({
+  name: 'attribute-wrap',
   description: 'Put one attribute per line when an opening tag is longer than printWidth',
   messages: { wrap: 'Opening tag <{{name}}> is longer than {{width}} characters. Put one attribute per line.' },
   check({ doc, settings, report }) {

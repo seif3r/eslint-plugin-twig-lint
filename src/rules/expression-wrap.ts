@@ -3,6 +3,7 @@ import { expressionWrapProblems } from '../util/wrap.ts';
 
 /** Twig expressions longer than printWidth are broken according to rules A–D in test/README.md. */
 export default createRule({
+  name: 'expression-wrap',
   description: 'Break Twig expressions that are longer than printWidth',
   messages: { wrap: 'Twig expression is longer than {{width}} characters.' },
   check({ doc, settings, report }) {

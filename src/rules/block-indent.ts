@@ -3,6 +3,7 @@ import { indentProblems } from '../util/indent.ts';
 
 /** Indentation after Twig blocks and HTML elements, including conditional `<x>`…`</x>` pairs. */
 export default createRule({
+  name: 'block-indent',
   description: 'Enforce indentation of Twig blocks and HTML elements',
   messages: { wrong: 'Expected indentation of {{expected}} but found {{actual}}.' },
   check({ doc, settings, report }) {

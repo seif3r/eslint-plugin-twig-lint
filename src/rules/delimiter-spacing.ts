@@ -2,6 +2,7 @@ import { createRule } from '../util/rule.ts';
 
 /** Exactly one space inside `{{ }}`, `{% %}` and `{# #}`. Newlines inside are left alone. */
 export default createRule({
+  name: 'delimiter-spacing',
   description: 'Require exactly one space inside Twig delimiters',
   messages: {
     afterOpen: 'Expected exactly one space after "{{open}}".',

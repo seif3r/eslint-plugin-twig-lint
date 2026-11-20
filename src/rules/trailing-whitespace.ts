@@ -1,6 +1,7 @@
 import { createRule } from '../util/rule.ts';
 
 export default createRule({
+  name: 'trailing-whitespace',
   description: 'Disallow whitespace at the end of lines',
   messages: { trailing: 'Trailing whitespace.' },
   check({ doc, report }) {

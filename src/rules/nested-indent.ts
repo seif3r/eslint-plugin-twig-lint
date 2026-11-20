@@ -3,6 +3,7 @@ import { indentProblems } from '../util/indent.ts';
 
 /** Indentation inside multi-line Twig expressions: one step per line that opens brackets. */
 export default createRule({
+  name: 'nested-indent',
   description: 'Enforce indentation inside multi-line Twig expressions',
   messages: { wrong: 'Expected indentation of {{expected}} but found {{actual}}.' },
   check({ doc, settings, report }) {

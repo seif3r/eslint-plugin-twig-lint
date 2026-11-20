@@ -7,6 +7,7 @@ interface Options {
 
 /** A space before attribute output in an HTML tag: `<p{{ attrs }}>` → `<p {{ attrs }}>`. */
 export default createRule<Options>({
+  name: 'attribute-spacing',
   description: 'Enforce a space before attribute output in HTML tags',
   optionsSchema: { mode: { enum: ['space', 'tight'] } },
   defaultOptions: { mode: 'space' },

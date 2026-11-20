@@ -19,6 +19,8 @@ export interface SharedSettings {
   printWidth: number;
 }
 
+const DOCS_URL = 'https://github.com/seif3r/eslint-plugin-twig-lint/blob/main/docs/rules';
+
 export const DEFAULT_SETTINGS: SharedSettings = { indentSize: 2, useTabs: false, printWidth: 80 };
 
 interface Fixer {
@@ -46,7 +48,7 @@ export interface TwigRuleDefinition {
   meta: {
     type: 'layout' | 'problem' | 'suggestion';
     fixable?: 'whitespace' | 'code';
-    docs: { description: string; recommended: boolean };
+    docs: { description: string; recommended: boolean; url: string };
     schema: unknown[];
     messages: Record<string, string>;
     language: 'twig-lint/twig';
@@ -64,6 +66,8 @@ export interface RuleHelpers<O> {
 }
 
 interface CreateRuleOptions<O> {
+  /** Rule id without the plugin prefix, e.g. `attribute-spacing`. */
+  name: string;
   description: string;
   type?: 'layout' | 'problem' | 'suggestion';
   fixable?: boolean;
@@ -85,7 +89,7 @@ export function createRule<O extends object = Record<string, never>>(def: Create
     meta: {
       type: def.type ?? 'layout',
       ...(def.fixable === false ? {} : { fixable: 'whitespace' as const }),
-      docs: { description: def.description, recommended: true },
+      docs: { description: def.description, recommended: true, url: `${DOCS_URL}/${def.name}.md` },
       schema: [{ type: 'object', properties: { ...SETTINGS_SCHEMA, ...def.optionsSchema }, additionalProperties: false }],
       messages: def.messages,
       language: 'twig-lint/twig',

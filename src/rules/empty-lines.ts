@@ -1,6 +1,7 @@
 import { createRule } from '../util/rule.ts';
 
 export default createRule({
+  name: 'empty-lines',
   description: 'Allow at most one empty line in a row',
   messages: { tooMany: 'More than one empty line in a row.' },
   check({ doc, report }) {

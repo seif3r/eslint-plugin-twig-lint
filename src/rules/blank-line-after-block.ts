@@ -7,6 +7,7 @@ const MIDDLE_OR_END = /^(end\w+|else|elseif|plural)$/;
  * except before another closing tag, `{% else %}`, `</…>`, something that ends a tag or expression, or end of file.
  */
 export default createRule({
+  name: 'blank-line-after-block',
   description: 'Require an empty line after a closing block tag',
   messages: { missing: 'Expected an empty line after {% {{tag}} %}.' },
   check({ doc, report }) {
