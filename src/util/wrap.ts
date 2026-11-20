@@ -172,7 +172,7 @@ export function attributeWrapProblems(doc: Doc, settings: SharedSettings): WrapP
 const isOpenBracket = (t: Token | undefined): boolean => t !== undefined && t.type === 'punctuation' && '([{'.includes(t.value);
 
 /** Indexes (within [from, to]) of top-level tokens, i.e. not inside brackets. */
-function topLevel(tokens: Token[], from: number, to: number): number[] {
+export function topLevel(tokens: Token[], from: number, to: number): number[] {
   const out: number[] = [];
   for (let k = from; k <= to; k++) {
     out.push(k);
@@ -183,7 +183,7 @@ function topLevel(tokens: Token[], from: number, to: number): number[] {
 }
 
 /** Splits [from, to] at top-level commas. A trailing comma does not produce an empty part. */
-function splitCommas(tokens: Token[], from: number, to: number): Array<[number, number]> {
+export function splitCommas(tokens: Token[], from: number, to: number): Array<[number, number]> {
   const parts: Array<[number, number]> = [];
   let a = from;
   for (const k of topLevel(tokens, from, to)) {

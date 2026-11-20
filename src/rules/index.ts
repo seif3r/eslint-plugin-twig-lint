@@ -7,7 +7,14 @@ import emptyLines from './empty-lines.ts';
 import endblockName from './endblock-name.ts';
 import expressionWrap from './expression-wrap.ts';
 import finalNewline from './final-newline.ts';
+import hashKeyQuotes from './hash-key-quotes.ts';
+import hashSpacing from './hash-spacing.ts';
+import namedArguments from './named-arguments.ts';
 import nestedIndent from './nested-indent.ts';
+import operatorSpacing from './operator-spacing.ts';
+import punctuationSpacing from './punctuation-spacing.ts';
+import singleQuotes from './single-quotes.ts';
+import trailingComma from './trailing-comma.ts';
 import trailingWhitespace from './trailing-whitespace.ts';
 
 export const rules = {
@@ -20,6 +27,13 @@ export const rules = {
   'endblock-name': endblockName,
   'expression-wrap': expressionWrap,
   'final-newline': finalNewline,
+  'hash-key-quotes': hashKeyQuotes,
+  'hash-spacing': hashSpacing,
+  'named-arguments': namedArguments,
   'nested-indent': nestedIndent,
+  'operator-spacing': operatorSpacing,
+  'punctuation-spacing': punctuationSpacing,
+  'single-quotes': singleQuotes,
+  'trailing-comma': trailingComma,
   'trailing-whitespace': trailingWhitespace,
 };

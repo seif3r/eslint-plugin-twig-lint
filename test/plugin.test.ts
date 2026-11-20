@@ -94,3 +94,23 @@ test('rule option: endblock-name never', async () => {
   const rules = { 'twig-lint/endblock-name': ['error', { mode: 'never' }] };
   assert.equal(await fix(text, { rules }), '{% block a %}\n  x\n{% endblock %}\n\n{% block b %}\n  y\n{% endblock %}\n');
 });
+
+test('syntax rules leave tricky but valid code alone', async () => {
+  const text = [
+    "{{ -x }}",
+    "{{ a - -b }}",
+    "{{ [1, 2, 3][1:2]|join }}",
+    "{{ 6 b-and 3 }}",
+    "{{ {in: 1, is: 2}|keys|join(', ') }}",
+    "{{ items|map((item, key) => item.title ~ key) }}",
+    "{{ value is same as(false) ? 'yes' : 'no' }}",
+    "{{ (a and b) or c }}",
+    "{{ user?.name ?? 'Anonymous' }}",
+    "{{ items|filter(item => item.visible)|length }}",
+    "{% for i in 1..3 %}",
+    "  {{ loop.index0 }}",
+    "{% endfor %}",
+    '',
+  ].join('\n');
+  assert.deepEqual((await lint(text)).map((m) => `${m.line}: ${m.ruleId}`), []);
+});

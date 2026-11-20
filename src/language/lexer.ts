@@ -43,7 +43,9 @@ export class TwigParseError extends Error {
   }
 }
 
-const NAME = /[a-zA-Z_\x7f-￿][a-zA-Z0-9_\x7f-￿]*/y;
+const NAME = /[a-zA-Z_\x7f-\uffff][a-zA-Z0-9_\x7f-\uffff]*/y;
+/** Bitwise word operators contain a dash, so they must be matched before names. */
+const BITWISE = /b-(?:and|or|xor)(?![a-zA-Z0-9_\x7f-\uffff])/y;
 const NUMBER = /[0-9][0-9_]*(?:\.[0-9][0-9_]*)?(?:[eE][+-]?[0-9]+)?/y;
 const OPERATOR = /===|!==|<=>|\.\.\.|==|!=|<=|>=|\.\.|\?\?|\?:|\?\.|=>|\*\*|\/\/|[+\-*/%~<>=!]/y;
 const PUNCTUATION = '()[]{}?:.,|';
@@ -174,6 +176,13 @@ function lexTwig(src: string, start: number): Segment {
     let m = NUMBER.exec(src);
     if (m) {
       tokens.push({ type: 'number', value: m[0], start: i, end: i + m[0].length });
+      i += m[0].length;
+      continue;
+    }
+    BITWISE.lastIndex = i;
+    m = BITWISE.exec(src);
+    if (m) {
+      tokens.push({ type: 'operator', value: m[0], start: i, end: i + m[0].length });
       i += m[0].length;
       continue;
     }

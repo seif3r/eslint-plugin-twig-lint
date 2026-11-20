@@ -1,0 +1,26 @@
+{% set total = price * quantity + shipping %}
+{% set is_free = total == 0 and not (has_fee) %}
+{% set range = 1..5 %}
+{% set name = user.name|default('Anonymous')|upper %}
+{% set offset = -1 %}
+{% set items = ['a', 'b', 'c'] %}
+{% set config = {title: title, 'aria-label': label, size: 'large'} %}
+{{ include('theme:button', {text: label}, with_context: false) }}
+{{ is_active ? 'Active' : 'Inactive' }}
+{{ items|map(item => item.title)|join(', ') }}
+{{ dump() }}
+{% set filtered = items|filter((item, key) => item starts with 'x') %}
+{% set slice = items[1:2] %}
+{% set flags = 6 b-and 3 %}
+{% if value is not empty and value in [1, 2] %}
+  {{ value }}
+{% endif %}
+
+{% set settings = {
+  title: title,
+  size: 'large',
+} %}
+{{ include('theme:card', {
+  title: title,
+}, with_context: false) }}
+{{ "It's fine" ~ 'a "quoted" word' }}

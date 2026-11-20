@@ -129,6 +129,13 @@ All rules are in `recommended` and can be fixed with `--fix`.
 | [`twig-lint/expression-wrap`](docs/rules/expression-wrap.md) | Breaks Twig expressions longer than `printWidth`: maps, `set`, `if` and call arguments |
 | [`twig-lint/delimiter-spacing`](docs/rules/delimiter-spacing.md) | Exactly one space inside `{{ }}`, `{% %}` and `{# #}` |
 | [`twig-lint/endblock-name`](docs/rules/endblock-name.md) | `{% endblock content %}` and `{% endmacro card %}`. Option `mode`: `always` (default) or `never` |
+| [`twig-lint/operator-spacing`](docs/rules/operator-spacing.md) | One space around binary operators, none around `.`, `\|` and `..` |
+| [`twig-lint/punctuation-spacing`](docs/rules/punctuation-spacing.md) | One space after commas, none inside brackets |
+| [`twig-lint/hash-spacing`](docs/rules/hash-spacing.md) | `{key: value}` and `name: value`: no space before the colon, one after |
+| [`twig-lint/single-quotes`](docs/rules/single-quotes.md) | `'single'` quotes unless the string contains `'` or uses interpolation |
+| [`twig-lint/hash-key-quotes`](docs/rules/hash-key-quotes.md) | No quotes around plain hash keys: `{'class': x}` → `{class: x}` |
+| [`twig-lint/trailing-comma`](docs/rules/trailing-comma.md) | A trailing comma when the closing bracket is on its own line. Option `multiline` |
+| [`twig-lint/named-arguments`](docs/rules/named-arguments.md) | `with_context: false` instead of the deprecated `with_context = false` |
 | [`twig-lint/blank-line-after-block`](docs/rules/blank-line-after-block.md) | An empty line after `{% endif %}`, `{% endfor %}` and similar closing tags |
 | [`twig-lint/empty-lines`](docs/rules/empty-lines.md) | At most one empty line in a row |
 | [`twig-lint/trailing-whitespace`](docs/rules/trailing-whitespace.md) | No whitespace at the end of lines |
