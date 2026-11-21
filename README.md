@@ -188,6 +188,7 @@ automatically. Two of them offer a suggestion that you can apply in the editor.
 | [`twig-lint/isolated-include`](docs/rules/isolated-include.md) | `include()` with `with_context: false` and `{% include %}` with `only`. Option `embed`. The editor suggests the fix | no |
 | [`twig-lint/defined-check`](docs/rules/defined-check.md) | `x is defined and x is not empty` → `x is not empty`. Option `mode`: `simplify`, `require` or `allow`. The editor suggests the fix | no |
 | [`twig-lint/variable-name`](docs/rules/variable-name.md) | `snake_case` for variables, loop variables, macros and arrow function parameters created in the template | no |
+| [`twig-lint/no-debug`](docs/rules/no-debug.md) | Warns about debug output such as `dump()`, `kint()` and `dd()`. Option `functions`. The editor suggests removing it | no |
 | [`twig-lint/no-raw`](docs/rules/no-raw.md) | Warns about `\|raw`, which turns off escaping. Option `allow` for known-safe values | no |
 | [`twig-lint/deprecated-spaceless`](docs/rules/deprecated-spaceless.md) | Warns about the `spaceless` filter, deprecated since Twig 3.12 | no |
 

@@ -15,6 +15,7 @@ import includeStyle from './include-style.ts';
 import isolatedInclude from './isolated-include.ts';
 import namedArguments from './named-arguments.ts';
 import nestedIndent from './nested-indent.ts';
+import noDebug from './no-debug.ts';
 import noRaw from './no-raw.ts';
 import operatorSpacing from './operator-spacing.ts';
 import punctuationSpacing from './punctuation-spacing.ts';
@@ -41,6 +42,7 @@ export const rules = {
   'isolated-include': isolatedInclude,
   'named-arguments': namedArguments,
   'nested-indent': nestedIndent,
+  'no-debug': noDebug,
   'no-raw': noRaw,
   'operator-spacing': operatorSpacing,
   'punctuation-spacing': punctuationSpacing,

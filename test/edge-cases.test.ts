@@ -144,3 +144,34 @@ test('JavaScript language options from a global config do not break Twig files',
   const messages = await lint('{{ a }}\n', { languageOptions: { ecmaVersion: 'latest', sourceType: 'module' } });
   assert.deepEqual(messages, []);
 });
+
+test('no-debug: functions and filters, with a removal suggestion', async () => {
+  const code = [
+    '{{ dump() }}',
+    '<p>{{ dump(item) }} {{ item.title }}</p>',
+    '{{ content|dd }}',
+    '{% set x = kint(y) %}',
+    '{{ item.dump() }}',
+    '{{ dumper(x) }}',
+    '',
+  ].join('\n');
+  const messages = (await lint(code)).filter((m) => m.ruleId === 'twig-lint/no-debug');
+  assert.deepEqual(messages.map((m) => `${m.line}: ${m.message}`), [
+    '1: Remove the debug output "dump()" before committing.',
+    '2: Remove the debug output "dump()" before committing.',
+    '3: Remove the debug output "|dd" before committing.',
+    '4: Remove the debug output "kint()" before committing.',
+  ]);
+  const apply = (m: (typeof messages)[number]) => {
+    const f = m.suggestions![0]!.fix;
+    return code.slice(0, f.range[0]) + f.text + code.slice(f.range[1]);
+  };
+  assert.ok(apply(messages[0]!).startsWith('<p>{{ dump(item) }}'), 'a line with only the debug tag is removed');
+  assert.ok(apply(messages[1]!).includes('<p> {{ item.title }}</p>'), 'only the tag is removed when the line has more');
+  assert.equal(messages[2]!.suggestions?.length ?? 0, 0);
+});
+
+test('no-debug: the functions option replaces the list', async () => {
+  const rules = { 'twig-lint/no-debug': ['warn', { functions: ['my_debug'] }] };
+  assert.deepEqual((await lint('{{ dump(x) }}\n{{ my_debug(x) }}\n', { rules })).filter((m) => m.ruleId === 'twig-lint/no-debug').map((m) => m.line), [2]);
+});
