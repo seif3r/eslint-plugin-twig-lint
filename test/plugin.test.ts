@@ -271,3 +271,9 @@ test('drupal/component-reference when enabled', async () => {
   assert.deepEqual(await drupal(code), []);
   assert.deepEqual(await drupal(code, { rules: { 'twig-lint/drupal/component-reference': 'warn' } }), ['1:component-reference', '2:component-reference']);
 });
+
+test('no-raw: allow patterns match names and dotted paths', async () => {
+  const code = "{{ _block_content|raw }}\n{{ content.body|raw }}\n{{ item.render()|raw }}\n{{ other|raw }}\n{{ 'x' ~ media|raw }}\n";
+  const rules = { 'twig-lint/no-raw': ['warn', { allow: ['_block_*', 'content.*', 'media'] }] };
+  assert.deepEqual((await lint(code, { rules })).filter((m) => m.ruleId === 'twig-lint/no-raw').map((m) => m.line), [3, 4]);
+});

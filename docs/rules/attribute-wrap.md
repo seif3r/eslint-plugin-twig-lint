@@ -16,6 +16,8 @@ attribute goes on its own line one step in, and `>` goes on its own line at the 
 - For block elements (`div`, `li`, `p`, `figure`, `ul` …), content on the same line moves to its own lines.
   For inline elements (`a`, `span`, `strong`, `button` …), content stays right after `>`, since moving it
   would add visible spaces.
+- Tags with fewer than `minAttributes` attributes (default 2) stay on one line, however long. An `{% if %}`
+  between attributes counts as one attribute.
 - Tags that already span several lines are not touched.
 
 ## Examples
@@ -52,10 +54,37 @@ attribute goes on its own line one step in, and `>` goes on its own line at the 
 </li>
 ```
 
+```twig
+<div class="card card--featured card--with-a-very-long-modifier-name card--highlighted">
+  {{ content }}
+</div>
+```
+
+<!-- test-options: {"minAttributes": 1} -->
+
+### ❌ Incorrect with `minAttributes: 1`
+
+```twig
+<div class="card card--featured card--with-a-very-long-modifier-name card--highlighted">
+  {{ content }}
+</div>
+```
+
+### ✅ Correct with `minAttributes: 1`
+
+```twig
+<div
+  class="card card--featured card--with-a-very-long-modifier-name card--highlighted"
+>
+  {{ content }}
+</div>
+```
+
 ## Options
 
 | Option | Default | Description |
 |---|---|---|
+| `minAttributes` | `2` | Tags with fewer attributes are never broken |
 | `printWidth` | `80` | Maximum length of an opening tag before it is broken |
 | `indentSize` | `2` | Columns per indentation step |
 | `useTabs` | `false` | Indent with tabs instead of spaces |

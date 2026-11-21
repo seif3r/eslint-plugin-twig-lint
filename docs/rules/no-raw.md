@@ -10,7 +10,8 @@ Twig escapes output by default. `|raw` turns that off, so any HTML or script in 
 That is an XSS risk unless the value is known to be safe, for example markup that the CMS has already
 rendered and filtered.
 
-The rule has no fix. When `|raw` is intended, disable the warning with a comment that says why.
+The rule has no fix. When `|raw` is intended, disable the warning with a comment that says why, or list the
+values that are safe in the `allow` option.
 
 ## Examples
 
@@ -31,6 +32,21 @@ The rule has no fix. When `|raw` is intended, disable the warning with a comment
 {{ region_content|raw }}
 ```
 
+<!-- test-options: {"allow": ["_block_*", "media"]} -->
+
+### ✅ Correct with `allow: ["_block_*", "media"]`
+
+```twig
+{{ _block_content|raw }}
+{{ media|raw }}
+```
+
 ## Options
 
-This rule has no options of its own.
+| Option | Default | Description |
+|---|---|---|
+| `allow` | `[]` | Values where `\|raw` is fine: variable names or dotted paths such as `content.body`, with `*` as a wildcard. Expressions that are not a plain name or path, such as `item.render()\|raw`, are always reported. |
+
+```js
+"twig-lint/no-raw": ["warn", { allow: ["_block_*", "media"] }]
+```

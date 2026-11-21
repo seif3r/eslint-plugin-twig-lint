@@ -15,7 +15,7 @@ file. Only the ID lets Drupal attach the component's CSS and JS and validate its
 better choice.
 
 The rule reports `include()`, `{% include %}` and `{% embed %}` with a template path that points into a
-`components/` folder and ends with `.twig`. Other templates, such as `block.html.twig`, are not affected.
+components folder (`components/` by default, see `folders`) and ends with `.twig`. Other templates, such as `block.html.twig`, are not affected.
 There is no fix, because the rule cannot know which ID a path belongs to.
 
 ## Examples
@@ -36,6 +36,26 @@ There is no fix, because the rule cannot know which ID a path belongs to.
 {% extends 'block.html.twig' %}
 ```
 
+<!-- test-options: {"folders": ["components", "patterns"]} -->
+
+### ❌ Incorrect with `folders: ["components", "patterns"]`
+
+```twig
+{{ include('@my_theme/patterns/card/card.twig', with_context: false) }}
+```
+
+### ✅ Correct with `folders: ["components", "patterns"]`
+
+```twig
+{{ include('my_theme:card', with_context: false) }}
+```
+
 ## Options
 
-This rule has no options of its own.
+| Option | Default | Description |
+|---|---|---|
+| `folders` | `["components"]` | Names of the folders that hold components |
+
+```js
+"twig-lint/drupal/component-reference": ["warn", { folders: ["components", "patterns"] }]
+```

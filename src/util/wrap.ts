@@ -124,7 +124,8 @@ function attributeLines(doc: Doc, tag: HtmlTag, items: AttrItem[], level: number
   return out;
 }
 
-export function attributeWrapProblems(doc: Doc, settings: SharedSettings): WrapProblem[] {
+/** `minAttributes`: tags with fewer attributes (an `{% if %}` between attributes counts as one) are never broken. */
+export function attributeWrapProblems(doc: Doc, settings: SharedSettings, minAttributes = 2): WrapProblem[] {
   const ctx: Ctx = { doc, cols: computeIndents(doc, settings.indentSize), unit: settings.indentSize, useTabs: settings.useTabs };
   const out: WrapProblem[] = [];
   for (const tag of doc.htmlTags) {
@@ -136,7 +137,7 @@ export function attributeWrapProblems(doc: Doc, settings: SharedSettings): WrapP
     const col = ctx.cols[li] ?? 0;
     if (col + (tag.end - first) <= settings.printWidth) continue;
     const items = attributeItems(doc, tag, tag.nameEnd, tag.closeStart);
-    if (!items.length) continue;
+    if (!items.length || items.length < minAttributes) continue;
 
     const lines: Array<[number, string]> = [[0, doc.src.slice(tag.start, tag.nameEnd)]];
     lines.push(...attributeLines(doc, tag, items, 1));

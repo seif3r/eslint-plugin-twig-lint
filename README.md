@@ -141,7 +141,7 @@ Enabled as `error`, all 🔧.
 | [`twig-lint/block-indent`](docs/rules/block-indent.md) | Indentation of Twig blocks and HTML elements |
 | [`twig-lint/nested-indent`](docs/rules/nested-indent.md) | Indentation inside multi-line expressions: one step per line that opens brackets |
 | [`twig-lint/attribute-spacing`](docs/rules/attribute-spacing.md) | `<p{{ attrs }}>` → `<p {{ attrs }}>`. Option `mode`: `space` (default) or `tight` |
-| [`twig-lint/attribute-wrap`](docs/rules/attribute-wrap.md) | One attribute per line when an opening tag is longer than `printWidth` |
+| [`twig-lint/attribute-wrap`](docs/rules/attribute-wrap.md) | One attribute per line when an opening tag is longer than `printWidth`. Option `minAttributes` (default 2) |
 | [`twig-lint/expression-wrap`](docs/rules/expression-wrap.md) | Breaks Twig expressions longer than `printWidth`: maps, `set`, `if` and call arguments |
 | [`twig-lint/delimiter-spacing`](docs/rules/delimiter-spacing.md) | Exactly one space inside `{{ }}`, `{% %}` and `{# #}` |
 | [`twig-lint/blank-line-after-block`](docs/rules/blank-line-after-block.md) | An empty line after `{% endif %}`, `{% endfor %}` and similar closing tags |
@@ -162,7 +162,7 @@ Enabled as `error`, all 🔧.
 | [`twig-lint/hash-key-quotes`](docs/rules/hash-key-quotes.md) | No quotes around plain hash keys: `{'class': x}` → `{class: x}` |
 | [`twig-lint/trailing-comma`](docs/rules/trailing-comma.md) | A trailing comma when the closing bracket is on its own line. Option `multiline` |
 | [`twig-lint/named-arguments`](docs/rules/named-arguments.md) | `with_context: false` instead of the deprecated `with_context = false` |
-| [`twig-lint/endblock-name`](docs/rules/endblock-name.md) | `{% endblock content %}` and `{% endmacro card %}`. Option `mode`: `always` (default) or `never` |
+| [`twig-lint/endblock-name`](docs/rules/endblock-name.md) | `{% endblock content %}` and `{% endmacro card %}`. Options `mode`: `always` (default) or `never`, and `minLines` |
 | [`twig-lint/include-style`](docs/rules/include-style.md) | `{{ include() }}` or `{% include %}`. Option `style`: `both` (default), `function` or `tag` |
 
 ### Best Practices
@@ -174,7 +174,7 @@ Enabled as `warn`.
 | [`twig-lint/isolated-include`](docs/rules/isolated-include.md) | 💡 `include()` with `with_context: false` and `{% include %}` with `only`. Option `embed` |
 | [`twig-lint/defined-check`](docs/rules/defined-check.md) | 💡 `x is defined and x is not empty` → `x is not empty`. Option `mode`: `simplify`, `require` or `allow` |
 | [`twig-lint/variable-name`](docs/rules/variable-name.md) | `snake_case` for variables, loop variables, macros and arrow function parameters created in the template |
-| [`twig-lint/no-raw`](docs/rules/no-raw.md) | Warns about `\|raw`, which turns off escaping |
+| [`twig-lint/no-raw`](docs/rules/no-raw.md) | Warns about `\|raw`, which turns off escaping. Option `allow` for known-safe values |
 | [`twig-lint/deprecated-spaceless`](docs/rules/deprecated-spaceless.md) | Warns about the `spaceless` filter, deprecated since Twig 3.12 |
 
 ### Drupal
@@ -185,7 +185,7 @@ Enabled by the `drupal` preset.
 |---|---|
 | [`twig-lint/drupal/attach-library-format`](docs/rules/drupal/attach-library-format.md) | `attach_library('extension/library')`, not a component ID like `'theme:button'`. `error` |
 | [`twig-lint/drupal/no-translate-variable`](docs/rules/drupal/no-translate-variable.md) | `\|t` on a variable cannot be extracted for translation. `warn` |
-| [`twig-lint/drupal/component-reference`](docs/rules/drupal/component-reference.md) | Include components by SDC ID, not by file path. Opt-in |
+| [`twig-lint/drupal/component-reference`](docs/rules/drupal/component-reference.md) | Include components by SDC ID, not by file path. Option `folders`. Opt-in |
 
 ### Examples
 

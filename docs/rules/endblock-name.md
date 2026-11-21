@@ -13,6 +13,9 @@ makes long blocks easier to follow.
 A name that does not match the opening tag, such as `{% block header %}` … `{% endblock footer %}`, is a Twig
 compile error. It is reported in both modes and fixed to the right name (or removed with `"never"`).
 
+With `minLines`, short blocks may leave out the name, since their start is in view anyway. A wrong name is
+still reported.
+
 Short blocks without an end tag, such as `{% block title page_title %}`, are not affected.
 
 ## Examples
@@ -45,12 +48,37 @@ Short blocks without an end tag, such as `{% block title page_title %}`, are not
 {% endmacro card %}
 ```
 
+<!-- test-options: {"minLines": 4} -->
+
+### ❌ Incorrect with `minLines: 4`
+
+```twig
+{% block content %}
+  <h2>{{ title }}</h2>
+  {{ content }}
+{% endblock %}
+```
+
+### ✅ Correct with `minLines: 4`
+
+```twig
+{% block content %}
+  <h2>{{ title }}</h2>
+  {{ content }}
+{% endblock content %}
+```
+
+```twig
+{% block title %}{{ title }}{% endblock %}
+```
+
 ## Options
 
 | Option | Default | Description |
 |---|---|---|
 | `mode` | `"always"` | `"always"` requires the name on the end tag. `"never"` removes it: `{% endblock %}` |
+| `minLines` | `0` | With `"always"`: blocks shorter than this many lines, counting the opening and closing tag lines, may leave out the name |
 
 ```js
-"twig-lint/endblock-name": ["error", { mode: "never" }]
+"twig-lint/endblock-name": ["error", { mode: "always", minLines: 10 }]
 ```
