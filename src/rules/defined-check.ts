@@ -53,7 +53,7 @@ export default createRule<Options>({
   optionsSchema: { mode: { enum: ['simplify', 'allow', 'require'] } },
   defaultOptions: { mode: 'simplify' },
   messages: {
-    simplify: '"{{x}} is defined and {{x}} is not empty" can be written "{{x}} is not empty".',
+    simplify: '"{{x}} is defined and {{x}} is not empty" can be written "{{x}} is not empty" when strict_variables is off (Drupal\'s default).',
     require: '"{{x}} is not empty" should be preceded by "{{x}} is defined and" when strict_variables is on.',
     useSimplified: 'Replace with "{{x}} is not empty".',
     addDefined: 'Add "{{x}} is defined and".',
