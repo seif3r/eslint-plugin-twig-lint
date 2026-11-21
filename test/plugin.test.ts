@@ -114,3 +114,51 @@ test('syntax rules leave tricky but valid code alone', async () => {
   ].join('\n');
   assert.deepEqual((await lint(text)).map((m) => `${m.line}: ${m.ruleId}`), []);
 });
+
+const style = (s: string) => ({ rules: { 'twig-lint/include-style': ['error', { style: s }] } });
+
+test('include-style: tag and function convert both ways', async () => {
+  const tags = [
+    "{% include 'card' %}\n",
+    "{% include 'card' with {a: 1} %}\n",
+    "{% include 'card' only %}\n",
+    "{% include 'card' with vars only %}\n",
+    "{% include 'card' ignore missing with {a: 1} only %}\n",
+    "{% include ['a', 'b'] %}\n",
+    "{%- include 'card' -%}\n",
+  ];
+  const functions = [
+    "{{ include('card') }}\n",
+    "{{ include('card', {a: 1}) }}\n",
+    "{{ include('card', with_context: false) }}\n",
+    "{{ include('card', vars, with_context: false) }}\n",
+    "{{ include('card', {a: 1}, with_context: false, ignore_missing: true) }}\n",
+    "{{ include(['a', 'b']) }}\n",
+    "{{- include('card') -}}\n",
+  ];
+  for (const [i, tag] of tags.entries()) {
+    assert.equal(await fix(tag, style('function')), functions[i]);
+    assert.equal(await fix(functions[i]!, style('tag')), tag);
+  }
+});
+
+test('include-style: positional and named variables', async () => {
+  assert.equal(await fix("{{ include('card', {a: 1}, false) }}\n", style('tag')), "{% include 'card' with {a: 1} only %}\n");
+  assert.equal(await fix("{{ include('card', variables: {a: 1}) }}\n", style('tag')), "{% include 'card' with {a: 1} %}\n");
+});
+
+test('include-style: no fix without an exact equivalent', async () => {
+  for (const code of [
+    "{{ include('card', sandboxed: true) }}\n",
+    "{{ include('card', with_context: is_isolated) }}\n",
+  ]) {
+    const messages = await lint(code, style('tag'));
+    assert.deepEqual(messages.map((m) => m.ruleId), ['twig-lint/include-style']);
+    assert.equal(await fix(code, style('tag')), code);
+  }
+});
+
+test('include-style: tag style leaves include() inside expressions alone', async () => {
+  const code = "{% set html = include('card') %}\n{{ include('card')|upper }}\n";
+  assert.deepEqual(await lint(code, style('tag')), []);
+});

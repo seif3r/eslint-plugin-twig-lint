@@ -9,6 +9,7 @@ import expressionWrap from './expression-wrap.ts';
 import finalNewline from './final-newline.ts';
 import hashKeyQuotes from './hash-key-quotes.ts';
 import hashSpacing from './hash-spacing.ts';
+import includeStyle from './include-style.ts';
 import namedArguments from './named-arguments.ts';
 import nestedIndent from './nested-indent.ts';
 import operatorSpacing from './operator-spacing.ts';
@@ -29,6 +30,7 @@ export const rules = {
   'final-newline': finalNewline,
   'hash-key-quotes': hashKeyQuotes,
   'hash-spacing': hashSpacing,
+  'include-style': includeStyle,
   'named-arguments': namedArguments,
   'nested-indent': nestedIndent,
   'operator-spacing': operatorSpacing,

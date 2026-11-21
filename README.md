@@ -136,6 +136,7 @@ All rules are in `recommended` and can be fixed with `--fix`.
 | [`twig-lint/hash-key-quotes`](docs/rules/hash-key-quotes.md) | No quotes around plain hash keys: `{'class': x}` → `{class: x}` |
 | [`twig-lint/trailing-comma`](docs/rules/trailing-comma.md) | A trailing comma when the closing bracket is on its own line. Option `multiline` |
 | [`twig-lint/named-arguments`](docs/rules/named-arguments.md) | `with_context: false` instead of the deprecated `with_context = false` |
+| [`twig-lint/include-style`](docs/rules/include-style.md) | `{{ include() }}` or `{% include %}`. Option `style`: `both` (default), `function` or `tag` |
 | [`twig-lint/blank-line-after-block`](docs/rules/blank-line-after-block.md) | An empty line after `{% endif %}`, `{% endfor %}` and similar closing tags |
 | [`twig-lint/empty-lines`](docs/rules/empty-lines.md) | At most one empty line in a row |
 | [`twig-lint/trailing-whitespace`](docs/rules/trailing-whitespace.md) | No whitespace at the end of lines |
