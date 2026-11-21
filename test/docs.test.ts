@@ -60,8 +60,18 @@ for (const page of readdirSync(docsDir).sort()) {
       for (const [i, code] of incorrect.entries()) {
         const [result] = await linter.lintText(code, { filePath });
         assert.ok(result!.messages.some((m) => m.ruleId === rule), `incorrect example${label} is not reported by ${rule}:\n${code}`);
-        const [fixed] = await fixer.lintText(code, { filePath });
-        if (correct[i] !== undefined) assert.equal(fixed!.output ?? code, correct[i], `--fix of incorrect example ${i + 1}${label}`);
+        if (correct[i] === undefined) continue;
+        const meta = plugin.rules[rule.slice('twig-lint/'.length) as keyof typeof plugin.rules].meta;
+        if (meta.fixable) {
+          const [fixed] = await fixer.lintText(code, { filePath });
+          assert.equal(fixed!.output ?? code, correct[i], `--fix of incorrect example ${i + 1}${label}`);
+        } else if (meta.hasSuggestions) {
+          // Apply the first suggestion of each problem from this rule, last to first.
+          const fixes = result!.messages.filter((m) => m.ruleId === rule).map((m) => m.suggestions?.[0]?.fix).filter((f) => f !== undefined);
+          let out = code;
+          for (const f of fixes.sort((x, y) => y.range[0] - x.range[0])) out = out.slice(0, f.range[0]) + f.text + out.slice(f.range[1]);
+          assert.equal(out, correct[i], `suggestion for incorrect example ${i + 1}${label}`);
+        }
       }
     }
   });

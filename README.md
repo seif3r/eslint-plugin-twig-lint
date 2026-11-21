@@ -18,6 +18,9 @@ Lint and format Twig templates with ESLint.
 - [Presets](#presets)
 - [Settings](#settings)
 - [Rules](#rules)
+  - [Layout](#layout)
+  - [Syntax](#syntax)
+  - [Best Practices](#best-practices)
   - [Examples](#examples)
   - [Disabling Rules](#disabling-rules)
 - [FAQ](#faq)
@@ -59,7 +62,7 @@ npm install --save-dev eslint eslint-plugin-twig-lint
 import twigLint from "eslint-plugin-twig-lint";
 
 export default [
-  // Parse **/*.twig as Twig and enable all rules as errors.
+  // Parse **/*.twig as Twig and enable all rules.
   twigLint.configs.recommended,
 
   {
@@ -104,7 +107,7 @@ The language id depends on which Twig extension you use. Check the language mode
 ## Presets
 
 - `recommended`\
-  Parse `**/*.twig` with the Twig language and enable all rules as `error`.
+  Parse `**/*.twig` with the Twig language. Layout and syntax rules are `error`, best practices are `warn`.
 
 ## Settings
 
@@ -118,7 +121,11 @@ Shared settings go in `settings["twig-lint"]`. Every rule also accepts them as o
 
 ## Rules
 
-All rules are in `recommended` and can be fixed with `--fix`.
+All rules are in `recommended`. 🔧 means `--fix` can fix it, 💡 that the editor offers a suggestion.
+
+### Layout
+
+Enabled as `error`, all 🔧.
 
 | Rule | Description |
 |---|---|
@@ -128,7 +135,17 @@ All rules are in `recommended` and can be fixed with `--fix`.
 | [`twig-lint/attribute-wrap`](docs/rules/attribute-wrap.md) | One attribute per line when an opening tag is longer than `printWidth` |
 | [`twig-lint/expression-wrap`](docs/rules/expression-wrap.md) | Breaks Twig expressions longer than `printWidth`: maps, `set`, `if` and call arguments |
 | [`twig-lint/delimiter-spacing`](docs/rules/delimiter-spacing.md) | Exactly one space inside `{{ }}`, `{% %}` and `{# #}` |
-| [`twig-lint/endblock-name`](docs/rules/endblock-name.md) | `{% endblock content %}` and `{% endmacro card %}`. Option `mode`: `always` (default) or `never` |
+| [`twig-lint/blank-line-after-block`](docs/rules/blank-line-after-block.md) | An empty line after `{% endif %}`, `{% endfor %}` and similar closing tags |
+| [`twig-lint/empty-lines`](docs/rules/empty-lines.md) | At most one empty line in a row |
+| [`twig-lint/trailing-whitespace`](docs/rules/trailing-whitespace.md) | No whitespace at the end of lines |
+| [`twig-lint/final-newline`](docs/rules/final-newline.md) | Exactly one newline at the end of the file |
+
+### Syntax
+
+Enabled as `error`, all 🔧.
+
+| Rule | Description |
+|---|---|
 | [`twig-lint/operator-spacing`](docs/rules/operator-spacing.md) | One space around binary operators, none around `.`, `\|` and `..` |
 | [`twig-lint/punctuation-spacing`](docs/rules/punctuation-spacing.md) | One space after commas, none inside brackets |
 | [`twig-lint/hash-spacing`](docs/rules/hash-spacing.md) | `{key: value}` and `name: value`: no space before the colon, one after |
@@ -136,11 +153,20 @@ All rules are in `recommended` and can be fixed with `--fix`.
 | [`twig-lint/hash-key-quotes`](docs/rules/hash-key-quotes.md) | No quotes around plain hash keys: `{'class': x}` → `{class: x}` |
 | [`twig-lint/trailing-comma`](docs/rules/trailing-comma.md) | A trailing comma when the closing bracket is on its own line. Option `multiline` |
 | [`twig-lint/named-arguments`](docs/rules/named-arguments.md) | `with_context: false` instead of the deprecated `with_context = false` |
+| [`twig-lint/endblock-name`](docs/rules/endblock-name.md) | `{% endblock content %}` and `{% endmacro card %}`. Option `mode`: `always` (default) or `never` |
 | [`twig-lint/include-style`](docs/rules/include-style.md) | `{{ include() }}` or `{% include %}`. Option `style`: `both` (default), `function` or `tag` |
-| [`twig-lint/blank-line-after-block`](docs/rules/blank-line-after-block.md) | An empty line after `{% endif %}`, `{% endfor %}` and similar closing tags |
-| [`twig-lint/empty-lines`](docs/rules/empty-lines.md) | At most one empty line in a row |
-| [`twig-lint/trailing-whitespace`](docs/rules/trailing-whitespace.md) | No whitespace at the end of lines |
-| [`twig-lint/final-newline`](docs/rules/final-newline.md) | Exactly one newline at the end of the file |
+
+### Best Practices
+
+Enabled as `warn`.
+
+| Rule | Description |
+|---|---|
+| [`twig-lint/isolated-include`](docs/rules/isolated-include.md) | 💡 `include()` with `with_context: false` and `{% include %}` with `only`. Option `embed` |
+| [`twig-lint/defined-check`](docs/rules/defined-check.md) | 💡 `x is defined and x is not empty` → `x is not empty`. Option `mode`: `simplify`, `require` or `allow` |
+| [`twig-lint/variable-name`](docs/rules/variable-name.md) | `snake_case` for variables, loop variables, macros and arrow function parameters created in the template |
+| [`twig-lint/no-raw`](docs/rules/no-raw.md) | Warns about `\|raw`, which turns off escaping |
+| [`twig-lint/deprecated-spaceless`](docs/rules/deprecated-spaceless.md) | Warns about the `spaceless` filter, deprecated since Twig 3.12 |
 
 ### Examples
 

@@ -115,7 +115,7 @@ test('syntax rules leave tricky but valid code alone', async () => {
   assert.deepEqual((await lint(text)).map((m) => `${m.line}: ${m.ruleId}`), []);
 });
 
-const style = (s: string) => ({ rules: { 'twig-lint/include-style': ['error', { style: s }] } });
+const style = (s: string) => ({ rules: { 'twig-lint/include-style': ['error', { style: s }], 'twig-lint/isolated-include': 'off' } });
 
 test('include-style: tag and function convert both ways', async () => {
   const tags = [
@@ -161,4 +161,73 @@ test('include-style: no fix without an exact equivalent', async () => {
 test('include-style: tag style leaves include() inside expressions alone', async () => {
   const code = "{% set html = include('card') %}\n{{ include('card')|upper }}\n";
   assert.deepEqual(await lint(code, style('tag')), []);
+});
+
+const ids = async (code: string, extra?: Record<string, unknown>) =>
+  (await lint(code, extra)).map((m) => `${m.line}:${m.ruleId}:${m.severity}`);
+
+test('warn-only rules are warnings in recommended', async () => {
+  assert.deepEqual(await ids("{{ body|raw }}\n"), ['1:twig-lint/no-raw:1']);
+});
+
+test('variable-name: what is checked', async () => {
+  const code = [
+    "{% set first, secondValue = 1, 2 %}",
+    "{% for key, ItemValue in items %}",
+    "  {{ key ~ ItemValue ~ first ~ secondValue }}",
+    "{% endfor %}",
+    "",
+    "{% macro cardList(cardItems = [], _internal = false, item2 = null) %}",
+    "  {{ cardItems|map(singleCard => singleCard)|join }}",
+    "{% endmacro cardList %}",
+    "{{ someDrupalVariable }}",
+    '',
+  ].join('\n');
+  assert.deepEqual((await lint(code)).filter((m) => m.ruleId === 'twig-lint/variable-name').map((m) => m.message), [
+    'The variable "secondValue" should be snake_case: "second_value".',
+    'The loop variable "ItemValue" should be snake_case: "item_value".',
+    'The macro "cardList" should be snake_case: "card_list".',
+    'The macro argument "cardItems" should be snake_case: "card_items".',
+    'The arrow function parameter "singleCard" should be snake_case: "single_card".',
+  ]);
+});
+
+test('isolated-include: accepted and reported forms', async () => {
+  const ok = [
+    "{{ include('a', {}, false) }}",
+    "{{ include('a', with_context: false) }}",
+    "{% set html = include('a', with_context: false) %}",
+    "{% include 'a' only %}",
+    "{{ helper.include('a') }}",
+    "{% embed 'a' %}{% endembed %}",
+    '',
+  ].join('\n');
+  assert.deepEqual((await lint(ok)).filter((m) => m.ruleId === 'twig-lint/isolated-include'), []);
+  const bad = "{{ include('a', with_context: true) }}\n{{ include('a', with_context: isolated) }}\n{% set html = include('a') %}\n";
+  assert.deepEqual((await lint(bad)).filter((m) => m.ruleId === 'twig-lint/isolated-include').map((m) => m.line), [1, 2, 3]);
+});
+
+test('isolated-include: the suggestion handles a trailing comma', async () => {
+  const code = "{{ include('a', {\n  b: 1,\n},\n) }}\n";
+  const [m] = (await lint(code)).filter((x) => x.ruleId === 'twig-lint/isolated-include');
+  const f = m!.suggestions![0]!.fix;
+  assert.equal(code.slice(0, f.range[0]) + f.text + code.slice(f.range[1]), "{{ include('a', {\n  b: 1,\n}, with_context: false,\n) }}\n");
+});
+
+test('defined-check: operands must match', async () => {
+  const code = [
+    "{% if node.field_tags[0].value is defined and node.field_tags[0].value is not empty %}{% endif %}",
+    "{% if a is defined and b is not empty %}{% endif %}",
+    "{% if c or title is defined and title is not empty %}{% endif %}",
+    '',
+  ].join('\n');
+  assert.deepEqual((await lint(code)).filter((m) => m.ruleId === 'twig-lint/defined-check').map((m) => m.line), [1, 3]);
+  const [m] = await lint("{{ x.y is defined and x.y is not empty }}\n");
+  assert.equal(m!.suggestions![0]!.fix.text, '');
+  assert.deepEqual(m!.suggestions![0]!.fix.range, [3, 22]);
+});
+
+test('deprecated-spaceless: filter forms', async () => {
+  const code = "{{ html|spaceless }}\n{% apply spaceless|upper %}x{% endapply %}\n{{ spaceless }}\n";
+  assert.deepEqual((await lint(code)).filter((m) => m.ruleId === 'twig-lint/deprecated-spaceless').map((m) => m.line), [1, 2]);
 });

@@ -33,14 +33,14 @@ only an output tag that is just an include call is reported. `{% set html = incl
 
 ```twig
 {% include 'theme:card' with {title: title} only %}
-{%- include 'theme:banner' ignore missing -%}
+{%- include 'theme:banner' ignore missing only -%}
 ```
 
 ### ✅ Correct with `style: "function"`
 
 ```twig
 {{ include('theme:card', {title: title}, with_context: false) }}
-{{- include('theme:banner', ignore_missing: true) -}}
+{{- include('theme:banner', with_context: false, ignore_missing: true) -}}
 ```
 
 <!-- test-options: {"style": "tag"} -->
@@ -62,7 +62,7 @@ only an output tag that is just an include call is reported. `{% set html = incl
 ```
 
 ```twig
-{% set html = include('theme:card') %}
+{% set html = include('theme:card', with_context: false) %}
 ```
 
 ## Options

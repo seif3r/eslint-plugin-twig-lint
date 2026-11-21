@@ -41,6 +41,7 @@ export interface TwigRuleContext {
     messageId: string;
     data?: Record<string, string | number>;
     fix?: ((fixer: Fixer) => unknown) | null;
+    suggest?: Array<{ messageId: string; data?: Record<string, string | number>; fix: (fixer: Fixer) => unknown }>;
   }): void;
 }
 
@@ -48,7 +49,9 @@ export interface TwigRuleDefinition {
   meta: {
     type: 'layout' | 'problem' | 'suggestion';
     fixable?: 'whitespace' | 'code';
-    docs: { description: string; recommended: boolean; url: string };
+    hasSuggestions?: boolean;
+    /** `level`: the severity in the `recommended` config. */
+    docs: { description: string; recommended: boolean; url: string; level: 'error' | 'warn' };
     schema: unknown[];
     messages: Record<string, string>;
     language: 'twig-lint/twig';
@@ -63,6 +66,17 @@ export interface RuleHelpers<O> {
   options: O;
   /** Reports a problem at position `pos` (offset in the text), with optional edits. */
   report(pos: number, messageId: string, data?: Record<string, string | number>, edits?: Edit[]): void;
+  /**
+   * Reports a problem with suggestions instead of a fix. Editors offer suggestions as quick fixes;
+   * `--fix` and formatting never apply them.
+   */
+  suggest(pos: number, messageId: string, data: Record<string, string | number> | undefined, suggestions: Suggestion[]): void;
+}
+
+export interface Suggestion {
+  messageId: string;
+  data?: Record<string, string | number>;
+  edits: Edit[];
 }
 
 interface CreateRuleOptions<O> {
@@ -70,7 +84,10 @@ interface CreateRuleOptions<O> {
   name: string;
   description: string;
   type?: 'layout' | 'problem' | 'suggestion';
+  /** Severity in the `recommended` config. Default `error`. */
+  level?: 'error' | 'warn';
   fixable?: boolean;
+  hasSuggestions?: boolean;
   /** JSON schema for the rule's options (an object). */
   optionsSchema?: Record<string, unknown>;
   defaultOptions?: O;
@@ -89,7 +106,8 @@ export function createRule<O extends object = Record<string, never>>(def: Create
     meta: {
       type: def.type ?? 'layout',
       ...(def.fixable === false ? {} : { fixable: 'whitespace' as const }),
-      docs: { description: def.description, recommended: true, url: `${DOCS_URL}/${def.name}.md` },
+      ...(def.hasSuggestions ? { hasSuggestions: true } : {}),
+      docs: { description: def.description, recommended: true, url: `${DOCS_URL}/${def.name}.md`, level: def.level ?? 'error' },
       schema: [{ type: 'object', properties: { ...SETTINGS_SCHEMA, ...def.optionsSchema }, additionalProperties: false }],
       messages: def.messages,
       language: 'twig-lint/twig',
@@ -118,6 +136,19 @@ export function createRule<O extends object = Record<string, never>>(def: Create
                 fix: edits?.length
                   ? (fixer) => edits.map((e) => fixer.replaceTextRange([e.start, e.end], e.text))
                   : null,
+              });
+            },
+            suggest(pos, messageId, data, suggestions) {
+              const at = sc.positionAt(pos);
+              context.report({
+                loc: { start: at, end: at },
+                messageId,
+                ...(data ? { data } : {}),
+                suggest: suggestions.map((sg) => ({
+                  messageId: sg.messageId,
+                  ...(sg.data ? { data: sg.data } : {}),
+                  fix: (fixer: Fixer) => sg.edits.map((e) => fixer.replaceTextRange([e.start, e.end], e.text)),
+                })),
               });
             },
           });

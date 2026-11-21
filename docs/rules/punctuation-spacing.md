@@ -18,7 +18,7 @@ Only spaces within a line are checked, so multi-line hashes, arrays and argument
 ```twig
 {% set sizes = [ 'small' , 'medium' ,'large' ] %}
 {{ dump(  ) }}
-{{ include( 'theme:button' ) }}
+{{ range( 1, 5 )|join(', ') }}
 ```
 
 ### ✅ Correct
@@ -26,7 +26,7 @@ Only spaces within a line are checked, so multi-line hashes, arrays and argument
 ```twig
 {% set sizes = ['small', 'medium', 'large'] %}
 {{ dump() }}
-{{ include('theme:button') }}
+{{ range(1, 5)|join(', ') }}
 ```
 
 ## Options

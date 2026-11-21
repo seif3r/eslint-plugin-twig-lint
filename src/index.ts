@@ -26,7 +26,9 @@ const plugin = {
       files: ['**/*.twig'],
       plugins: {} as Record<string, unknown>,
       language: 'twig-lint/twig',
-      rules: Object.fromEntries(Object.keys(rules).map((id) => [`twig-lint/${id}`, 'error'])) as Record<string, 'error'>,
+      rules: Object.fromEntries(
+        Object.entries(rules).map(([id, rule]) => [`twig-lint/${id}`, rule.meta.docs.level]),
+      ) as Record<string, 'error' | 'warn'>,
     },
   },
 };
