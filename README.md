@@ -21,6 +21,7 @@ Lint and format Twig templates with ESLint.
   - [Layout](#layout)
   - [Syntax](#syntax)
   - [Best Practices](#best-practices)
+  - [Drupal](#drupal)
   - [Examples](#examples)
   - [Disabling Rules](#disabling-rules)
 - [FAQ](#faq)
@@ -62,8 +63,11 @@ npm install --save-dev eslint eslint-plugin-twig-lint
 import twigLint from "eslint-plugin-twig-lint";
 
 export default [
-  // Parse **/*.twig as Twig and enable all rules.
+  // Parse **/*.twig as Twig and enable the general rules.
   twigLint.configs.recommended,
+
+  // Optional: rules for Drupal themes and modules.
+  twigLint.configs.drupal,
 
   {
     files: ["**/*.twig"],
@@ -107,7 +111,12 @@ The language id depends on which Twig extension you use. Check the language mode
 ## Presets
 
 - `recommended`\
-  Parse `**/*.twig` with the Twig language. Layout and syntax rules are `error`, best practices are `warn`.
+  Parse `**/*.twig` with the Twig language and enable the general rules. Layout and syntax rules are `error`,
+  best practices are `warn`.
+
+- `drupal`\
+  Enable the [Drupal rules](#drupal). Use it together with `recommended`. Opt-in rules such as
+  `drupal/component-reference` stay off until you enable them.
 
 ## Settings
 
@@ -167,6 +176,16 @@ Enabled as `warn`.
 | [`twig-lint/variable-name`](docs/rules/variable-name.md) | `snake_case` for variables, loop variables, macros and arrow function parameters created in the template |
 | [`twig-lint/no-raw`](docs/rules/no-raw.md) | Warns about `\|raw`, which turns off escaping |
 | [`twig-lint/deprecated-spaceless`](docs/rules/deprecated-spaceless.md) | Warns about the `spaceless` filter, deprecated since Twig 3.12 |
+
+### Drupal
+
+Enabled by the `drupal` preset.
+
+| Rule | Description |
+|---|---|
+| [`twig-lint/drupal/attach-library-format`](docs/rules/drupal/attach-library-format.md) | `attach_library('extension/library')`, not a component ID like `'theme:button'`. `error` |
+| [`twig-lint/drupal/no-translate-variable`](docs/rules/drupal/no-translate-variable.md) | `\|t` on a variable cannot be extracted for translation. `warn` |
+| [`twig-lint/drupal/component-reference`](docs/rules/drupal/component-reference.md) | Include components by SDC ID, not by file path. Opt-in |
 
 ### Examples
 
@@ -231,8 +250,9 @@ Prettier reprints the whole file in its own style. This plugin keeps your style 
 wrong, and it also works as a linter with per-rule levels and disable comments.
 
 **Is it only for Drupal?**\
-No. The rules work on any Twig template. Drupal-style templates (`create_attribute()`, `<p {{ attributes }}>`,
-`{% trans %}`) are well covered by the tests.
+No. The general rules work on any Twig template, and Drupal-style templates (`create_attribute()`,
+`<p {{ attributes }}>`, `{% trans %}`) are well covered by the tests. Rules that only make sense in Drupal are
+under `twig-lint/drupal/` and only run with the `drupal` preset.
 
 **What happens with a file that cannot be parsed?**\
 ESLint reports a fatal parsing error with the line and column, and `--fix` leaves the file untouched.

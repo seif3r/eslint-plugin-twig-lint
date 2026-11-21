@@ -33,19 +33,25 @@ function examples(markdown: string): Group[] {
 }
 
 function eslint(rule: string, options: string, fix = false): ESLint {
-  const config: Record<string, unknown>[] = [plugin.configs.recommended];
-  if (options) config.push({ files: ['**/*.twig'], rules: { [rule]: ['error', JSON.parse(options)] } });
+  // The page's own rule is always enabled, so opt-in rules are tested too.
+  const config: Record<string, unknown>[] = [plugin.configs.recommended, plugin.configs.drupal];
+  config.push({ files: ['**/*.twig'], rules: { [rule]: options ? ['error', JSON.parse(options)] : 'error' } });
   return new ESLint({ cwd: import.meta.dirname, overrideConfigFile: true, overrideConfig: config as ESLint.Options['overrideConfig'], fix });
 }
 
+/** Rule names of the doc pages, e.g. `attribute-spacing` and `drupal/no-raw`. */
+const pages = (readdirSync(docsDir, { recursive: true }) as string[])
+  .filter((f) => f.endsWith('.md'))
+  .map((f) => f.replace(/\\/g, '/').replace(/\.md$/, ''))
+  .sort();
+
 test('every rule has a docs page', () => {
-  const pages = readdirSync(docsDir).map((f) => f.replace(/\.md$/, '')).sort();
   assert.deepEqual(pages, Object.keys(plugin.rules).sort());
 });
 
-for (const page of readdirSync(docsDir).sort()) {
-  const rule = `twig-lint/${page.replace(/\.md$/, '')}`;
-  const groups = examples(readFileSync(join(docsDir, page), 'utf8'));
+for (const page of pages) {
+  const rule = `twig-lint/${page}`;
+  const groups = examples(readFileSync(join(docsDir, `${page}.md`), 'utf8'));
 
   test(`docs: ${rule}`, async () => {
     assert.ok(groups.some((g) => g.incorrect.length) && groups.some((g) => g.correct.length), 'page has no examples');

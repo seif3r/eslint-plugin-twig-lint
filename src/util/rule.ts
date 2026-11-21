@@ -51,7 +51,7 @@ export interface TwigRuleDefinition {
     fixable?: 'whitespace' | 'code';
     hasSuggestions?: boolean;
     /** `level`: the severity in the `recommended` config. */
-    docs: { description: string; recommended: boolean; url: string; level: 'error' | 'warn' };
+    docs: { description: string; recommended: boolean; url: string; level: 'error' | 'warn' | 'off' };
     schema: unknown[];
     messages: Record<string, string>;
     language: 'twig-lint/twig';
@@ -84,8 +84,11 @@ interface CreateRuleOptions<O> {
   name: string;
   description: string;
   type?: 'layout' | 'problem' | 'suggestion';
-  /** Severity in the `recommended` config. Default `error`. */
-  level?: 'error' | 'warn';
+  /**
+   * Severity in the preset the rule belongs to (`recommended`, or `drupal` for `drupal/*` rules).
+   * Default `error`. `off` makes the rule opt-in.
+   */
+  level?: 'error' | 'warn' | 'off';
   fixable?: boolean;
   hasSuggestions?: boolean;
   /** JSON schema for the rule's options (an object). */
@@ -107,7 +110,7 @@ export function createRule<O extends object = Record<string, never>>(def: Create
       type: def.type ?? 'layout',
       ...(def.fixable === false ? {} : { fixable: 'whitespace' as const }),
       ...(def.hasSuggestions ? { hasSuggestions: true } : {}),
-      docs: { description: def.description, recommended: true, url: `${DOCS_URL}/${def.name}.md`, level: def.level ?? 'error' },
+      docs: { description: def.description, recommended: (def.level ?? 'error') !== 'off', url: `${DOCS_URL}/${def.name}.md`, level: def.level ?? 'error' },
       schema: [{ type: 'object', properties: { ...SETTINGS_SCHEMA, ...def.optionsSchema }, additionalProperties: false }],
       messages: def.messages,
       language: 'twig-lint/twig',

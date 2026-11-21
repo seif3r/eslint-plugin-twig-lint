@@ -231,3 +231,43 @@ test('deprecated-spaceless: filter forms', async () => {
   const code = "{{ html|spaceless }}\n{% apply spaceless|upper %}x{% endapply %}\n{{ spaceless }}\n";
   assert.deepEqual((await lint(code)).filter((m) => m.ruleId === 'twig-lint/deprecated-spaceless').map((m) => m.line), [1, 2]);
 });
+
+test('presets: drupal rules only in configs.drupal, component-reference is opt-in', () => {
+  const recommended = Object.keys(plugin.configs.recommended.rules);
+  assert.ok(recommended.every((id) => !id.startsWith('twig-lint/drupal/')));
+  assert.deepEqual(plugin.configs.drupal.rules, {
+    'twig-lint/drupal/attach-library-format': 'error',
+    'twig-lint/drupal/no-translate-variable': 'warn',
+  });
+});
+
+const drupal = async (code: string, extra: Record<string, unknown> = {}) => {
+  const [result] = await new ESLint({
+    cwd: import.meta.dirname,
+    overrideConfigFile: true,
+    overrideConfig: [plugin.configs.recommended, plugin.configs.drupal, { files: ['**/*.twig'], ...extra }] as ESLint.Options['overrideConfig'],
+  }).lintText(code, { filePath: join(import.meta.dirname, 'x.twig') });
+  return result!.messages.filter((m) => m.ruleId?.startsWith('twig-lint/drupal/')).map((m) => `${m.line}:${m.ruleId!.slice(17)}`);
+};
+
+test('drupal/no-translate-variable', async () => {
+  const code = "{{ 'a' ~ 'b'|t }}\n{{ 'a' ~ label|t }}\n{{ item.label|trans }}\n{{ 'x'|t({'@a': b}) }}\n";
+  assert.deepEqual(await drupal(code), ['2:no-translate-variable', '3:no-translate-variable']);
+});
+
+test('drupal/attach-library-format', async () => {
+  const code = "{{ attach_library(library) }}\n{{ attach_library('a/b') }}\n{{ attach_library('a:b') }}\n{{ attach_library('A/b') }}\n";
+  assert.deepEqual(await drupal(code), ['3:attach-library-format', '4:attach-library-format']);
+});
+
+test('drupal/component-reference when enabled', async () => {
+  const code = [
+    "{% include '@t/components/card/card.twig' only %}",
+    "{% embed 'components/card.twig' only %}{% endembed %}",
+    "{{ include('t:card', with_context: false) }}",
+    "{{ include('@t/templates/page.html.twig', with_context: false) }}",
+    '',
+  ].join('\n');
+  assert.deepEqual(await drupal(code), []);
+  assert.deepEqual(await drupal(code, { rules: { 'twig-lint/drupal/component-reference': 'warn' } }), ['1:component-reference', '2:component-reference']);
+});
