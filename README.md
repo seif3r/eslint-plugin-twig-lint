@@ -273,9 +273,13 @@ Contributions are welcome! Open an issue or a pull request.
 ```sh
 npm install
 npm test           # all fixtures and plugin tests via ESLint's API
+npm run coverage   # the same, with a coverage report
 npm run typecheck
 npm run build      # compiles to dist/
 ```
+
+CI runs the tests on Node 22 and 24 with ESLint 9.15, 9 and 10, checks that the packed package works on its
+own, and runs the PHP checks below.
 
 The source is TypeScript that Node runs directly (type stripping, Node 22.18+). The published package
 contains compiled JavaScript in `dist/`.

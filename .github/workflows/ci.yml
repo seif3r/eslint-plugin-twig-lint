@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Node ${{ matrix.node }}, ESLint ${{ matrix.eslint }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # The source is TypeScript that Node runs directly, which needs Node 22.18 or later.
+        node: ['22', '24']
+        eslint: ['9.15.0', '9', '10']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - name: Use ESLint ${{ matrix.eslint }}
+        run: npm install --no-save eslint@${{ matrix.eslint }}
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - name: Check that the built package works on its own
+        run: |
+          mkdir -p "$RUNNER_TEMP/consumer"
+          npm pack --pack-destination "$RUNNER_TEMP/consumer"
+          cd "$RUNNER_TEMP/consumer"
+          npm init -y > /dev/null
+          npm install eslint@${{ matrix.eslint }} ./eslint-plugin-twig-lint-*.tgz
+          printf 'import twigLint from "eslint-plugin-twig-lint";\nexport default [twigLint.configs.recommended, twigLint.configs.drupal];\n' > eslint.config.mjs
+          printf '<div>\n<p{{ attrs }}>{{x}}</p>\n</div>\n' > page.html.twig
+          npx eslint --fix page.html.twig
+          printf '<div>\n  <p {{ attrs }}>{{ x }}</p>\n</div>\n' > expected.twig
+          diff expected.twig page.html.twig
+
+  twig:
+    name: Fixtures are valid Twig and render the same
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer
+          coverage: none
+      - name: Install Twig
+        run: |
+          mkdir -p "$RUNNER_TEMP/twig"
+          cd "$RUNNER_TEMP/twig"
+          composer require --no-interaction --no-progress twig/twig:^3.30
+      - name: Parse check
+        run: TWIG_AUTOLOAD="$RUNNER_TEMP/twig/vendor/autoload.php" php test/parse-check.php test/fixtures/*/expected.twig
+      - name: Render check
+        run: TWIG_AUTOLOAD="$RUNNER_TEMP/twig/vendor/autoload.php" php test/render-check.php test/fixtures/*/
