@@ -28,10 +28,12 @@ export class TwigLanguage {
   readonly visitorKeys = visitorKeys;
   readonly defaultLanguageOptions = {};
 
-  validateLanguageOptions(options: Record<string, unknown>): void {
-    const keys = Object.keys(options ?? {});
-    if (keys.length) throw new TypeError(`twig-lint/twig has no language options (got: ${keys.join(', ')}).`);
-  }
+  /**
+   * Twig has no language options. Options meant for other languages are ignored rather than rejected:
+   * configs without `files`, such as `js.configs.recommended`, pass their JavaScript options
+   * (`ecmaVersion`, `sourceType` …) to every file ESLint lints, including `.twig` files.
+   */
+  validateLanguageOptions(_options: Record<string, unknown>): void {}
 
   parse(file: File): TwigParseOk | TwigParseFail {
     const text = String(file.body);

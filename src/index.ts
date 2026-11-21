@@ -30,7 +30,7 @@ const rules = { ...generalRules, ...drupalRules };
 const plugin = {
   meta: {
     name: 'eslint-plugin-twig-lint',
-    version: '0.1.0',
+    version: '0.1.1',
     namespace: 'twig-lint',
   },
   languages: {

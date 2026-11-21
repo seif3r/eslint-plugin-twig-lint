@@ -112,7 +112,8 @@ test('deprecated-spaceless: the removed spaceless tag', async () => {
 
 test('SourceCode: traversal, parents, ranges and locations', () => {
   const language = new TwigLanguage();
-  assert.throws(() => language.validateLanguageOptions({ foo: 1 }), /no language options/);
+  // Options for other languages (from configs without `files`) are ignored, not rejected.
+  language.validateLanguageOptions({ ecmaVersion: 'latest', sourceType: 'module' });
   language.validateLanguageOptions({});
   const file = { body: '<p>{{ a }}</p>\n{# c #}\n', path: filePath };
   const result = language.parse(file);
@@ -137,4 +138,9 @@ test('multi-line strings keep their content', async () => {
 test('interpolation can contain strings and hashes', async () => {
   const input = '{{ "Hello #{ name ?: \'guest\' } and #{ {a: \'}\'}|length }" }}\n';
   assert.deepEqual(await problems(input), []);
+});
+
+test('JavaScript language options from a global config do not break Twig files', async () => {
+  const messages = await lint('{{ a }}\n', { languageOptions: { ecmaVersion: 'latest', sourceType: 'module' } });
+  assert.deepEqual(messages, []);
 });

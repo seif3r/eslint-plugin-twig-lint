@@ -85,6 +85,19 @@ export default [
 ];
 ```
 
+If your config has entries without `files`, such as `js.configs.recommended` or a shared config, limit them to
+your JavaScript files. Otherwise ESLint also runs their JavaScript rules on `.twig` files, which fails:
+
+```js
+const jsFiles = ["**/*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}"];
+
+export default [
+  { ...js.configs.recommended, files: jsFiles },
+  twigLint.configs.recommended,
+  twigLint.configs.drupal,
+];
+```
+
 Then run ESLint as usual:
 
 ```sh
