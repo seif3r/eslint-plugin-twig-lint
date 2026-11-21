@@ -188,7 +188,7 @@ automatically. Two of them offer a suggestion that you can apply in the editor.
 | [`twig-lint/isolated-include`](docs/rules/isolated-include.md) | `include()` with `with_context: false` and `{% include %}` with `only`. Option `embed`. The editor suggests the fix | no |
 | [`twig-lint/defined-check`](docs/rules/defined-check.md) | `x is defined and x is not empty` → `x is not empty`. Option `mode`: `simplify`, `require` or `allow`. The editor suggests the fix | no |
 | [`twig-lint/variable-name`](docs/rules/variable-name.md) | `snake_case` for variables, loop variables, macros and arrow function parameters created in the template | no |
-| [`twig-lint/no-debug`](docs/rules/no-debug.md) | Warns about debug output such as `dump()`, `kint()` and `dd()`. Option `functions`. The editor suggests removing it | no |
+| [`twig-lint/no-debug`](docs/rules/no-debug.md) | Warns about Twig's `dump()`. Options `additionalFunctions` and `functions`. The editor suggests removing it | no |
 | [`twig-lint/no-raw`](docs/rules/no-raw.md) | Warns about `\|raw`, which turns off escaping. Option `allow` for known-safe values | no |
 | [`twig-lint/deprecated-spaceless`](docs/rules/deprecated-spaceless.md) | Warns about the `spaceless` filter, deprecated since Twig 3.12 | no |
 
@@ -200,6 +200,7 @@ Enabled by the `drupal` preset.
 |---|---|---|---|
 | [`twig-lint/drupal/attach-library-format`](docs/rules/drupal/attach-library-format.md) | `attach_library('extension/library')`, not a component ID like `'theme:button'` | no | error |
 | [`twig-lint/drupal/no-translate-variable`](docs/rules/drupal/no-translate-variable.md) | `\|t` on a variable cannot be extracted for translation | no | warn |
+| [`twig-lint/drupal/no-debug`](docs/rules/drupal/no-debug.md) | Debug output from Devel and Twig Tweak, such as `kint()`, `dpm()` and `dd()`. Options `additionalFunctions` and `functions` | no | warn |
 | [`twig-lint/drupal/component-reference`](docs/rules/drupal/component-reference.md) | Include components by SDC ID, not by file path. Option `folders` | no | off (opt-in) |
 
 ### Examples

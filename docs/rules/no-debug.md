@@ -1,23 +1,17 @@
 # twig-lint/no-debug
 
-Disallow debug output such as `dump()` and `kint()`.
+Disallow Twig's `dump()` debug output.
 
 Fixable: no (the editor offers a suggestion). Level: `warn` in `recommended`.
 
 ## Rule details
 
-Debug helpers print variables to the page or the message area while developing. Left in a template, they
-show internal data to visitors, slow pages down, or do nothing at all when debug mode is off. They should not
-be committed.
+`dump()` prints variables while developing. Left in a template, it shows internal data to visitors when debug
+mode is on, and prints nothing when it is off. It should not be committed.
 
-By default the rule reports these functions, both called as functions (`dump(x)`) and used as filters
-(`x|dd`):
-
-| Name | From |
-|---|---|
-| `dump` | Twig (debug extension) |
-| `kint`, `ksm`, `kpr`, `dpm`, `dsm`, `devel_dump`, `devel_message`, `devel_breakpoint` | Drupal's Devel module |
-| `dd`, `drupal_dump` | Drupal's Twig Tweak module |
+By default the rule reports Twig's `dump`. Add your project's own debug helpers with `additionalFunctions`.
+Both function calls (`dump(x)`) and filters (`x|my_debug`) are reported. Debug helpers from Drupal modules
+are reported by [`drupal/no-debug`](drupal/no-debug.md).
 
 When the tag holds nothing but the debug call, such as `{{ dump(item) }}`, the editor offers to remove it.
 Removing debug output is never done by `--fix`, since it can be mixed with output that should stay.
@@ -31,31 +25,34 @@ Removing debug output is never done by `--fix`, since it can be mixed with outpu
 <p>{{ item.title }}</p>
 ```
 
-```twig
-{{ kint(content) }}
-{{ content }}
-```
-
-```twig
-{{ content|dd }}
-```
-
 ### Correct
 
 ```twig
 <p>{{ item.title }}</p>
 ```
 
+<!-- test-options: {"additionalFunctions": ["trace"]} -->
+
+### Incorrect with `additionalFunctions: ["trace"]`
+
 ```twig
-{{ content }}
+{{ trace(item) }}
+<p>{{ item.title }}</p>
+```
+
+### Correct with `additionalFunctions: ["trace"]`
+
+```twig
+<p>{{ item.title }}</p>
 ```
 
 ## Options
 
 | Option | Default | Description |
 |---|---|---|
-| `functions` | see the table above | Debug functions and filters to report. Replaces the default list. |
+| `additionalFunctions` | `[]` | Debug functions and filters to report in addition to `functions` |
+| `functions` | `["dump"]` | The base list. Setting it replaces the default |
 
 ```js
-"twig-lint/no-debug": ["warn", { functions: ["dump", "kint", "my_debug"] }]
+"twig-lint/no-debug": ["warn", { additionalFunctions: ["trace", "my_debug"] }]
 ```

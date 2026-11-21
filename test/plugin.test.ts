@@ -237,6 +237,7 @@ test('presets: drupal rules only in configs.drupal, component-reference is opt-i
   assert.ok(recommended.every((id) => !id.startsWith('twig-lint/drupal/')));
   assert.deepEqual(plugin.configs.drupal.rules, {
     'twig-lint/drupal/attach-library-format': 'error',
+    'twig-lint/drupal/no-debug': 'warn',
     'twig-lint/drupal/no-translate-variable': 'warn',
   });
 });
