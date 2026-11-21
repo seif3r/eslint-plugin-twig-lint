@@ -246,10 +246,6 @@ ESLint's disable comments work inside Twig comments:
 
 ## FAQ
 
-**Why not Prettier?**\
-Prettier reprints the whole file in its own style. This plugin keeps your style and only fixes what is
-wrong, and it also works as a linter with per-rule levels and disable comments.
-
 **Is it only for Drupal?**\
 No. The general rules work on any Twig template, and Drupal-style templates (`create_attribute()`,
 `<p {{ attributes }}>`, `{% trans %}`) are well covered by the tests. Rules that only make sense in Drupal are
