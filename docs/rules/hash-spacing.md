@@ -2,7 +2,7 @@
 
 Enforce spacing around the colon in hashes and named arguments.
 
-🔧 Fixable with `--fix` · ✅ Enabled in `recommended`
+Fixable: yes. Level: `error` in `recommended`.
 
 ## Rule details
 
@@ -11,14 +11,14 @@ and one space after it. The colon of a ternary is handled by [`operator-spacing`
 
 ## Examples
 
-### ❌ Incorrect
+### Incorrect
 
 ```twig
 {% set config = {title : title, size:'large'} %}
 {{ include('theme:card', config, with_context:false) }}
 ```
 
-### ✅ Correct
+### Correct
 
 ```twig
 {% set config = {title: title, size: 'large'} %}

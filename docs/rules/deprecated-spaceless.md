@@ -2,7 +2,7 @@
 
 Warn about the deprecated `spaceless` filter.
 
-⚠️ `warn` in `recommended`
+Fixable: no. Level: `warn` in `recommended`.
 
 ## Rule details
 
@@ -14,7 +14,7 @@ The rule has no fix, because removing `spaceless` can change the rendered whites
 
 ## Examples
 
-### ❌ Incorrect
+### Incorrect
 
 ```twig
 {% apply spaceless %}
@@ -25,7 +25,7 @@ The rule has no fix, because removing `spaceless` can change the rendered whites
 {% endapply %}
 ```
 
-### ✅ Correct
+### Correct
 
 ```twig
 <ul class="tabs">

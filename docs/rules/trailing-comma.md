@@ -2,7 +2,7 @@
 
 Enforce trailing commas in multi-line hashes, arrays and arguments.
 
-🔧 Fixable with `--fix` · ✅ Enabled in `recommended`
+Fixable: yes. Level: `error` in `recommended`.
 
 ## Rule details
 
@@ -16,7 +16,7 @@ Parentheses that group an expression, such as `(a and b)`, and arrow function pa
 
 ## Examples
 
-### ❌ Incorrect
+### Incorrect
 
 ```twig
 {% set settings = {
@@ -26,7 +26,7 @@ Parentheses that group an expression, such as `(a and b)`, and arrow function pa
 {% set sizes = ['small', 'large',] %}
 ```
 
-### ✅ Correct
+### Correct
 
 ```twig
 {% set settings = {

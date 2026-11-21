@@ -2,7 +2,7 @@
 
 Enforce the `include()` function or the `{% include %}` tag.
 
-🔧 Fixable with `--fix` · ✅ Enabled in `recommended` (with `style: "both"`, which reports nothing)
+Fixable: yes. Level: `error` in `recommended`, with `style: "both"`, which reports nothing.
 
 ## Rule details
 
@@ -29,14 +29,14 @@ only an output tag that is just an include call is reported. `{% set html = incl
 
 <!-- test-options: {"style": "function"} -->
 
-### ❌ Incorrect with `style: "function"`
+### Incorrect with `style: "function"`
 
 ```twig
 {% include 'theme:card' with {title: title} only %}
 {%- include 'theme:banner' ignore missing only -%}
 ```
 
-### ✅ Correct with `style: "function"`
+### Correct with `style: "function"`
 
 ```twig
 {{ include('theme:card', {title: title}, with_context: false) }}
@@ -45,7 +45,7 @@ only an output tag that is just an include call is reported. `{% set html = incl
 
 <!-- test-options: {"style": "tag"} -->
 
-### ❌ Incorrect with `style: "tag"`
+### Incorrect with `style: "tag"`
 
 ```twig
 {{ include('theme:card', {
@@ -53,7 +53,7 @@ only an output tag that is just an include call is reported. `{% set html = incl
 }, with_context: false) }}
 ```
 
-### ✅ Correct with `style: "tag"`
+### Correct with `style: "tag"`
 
 ```twig
 {% include 'theme:card' with {

@@ -2,7 +2,7 @@
 
 Enforce the `extension/library` format in `attach_library()`.
 
-❗ `error` in `drupal`
+Fixable: no. Level: `error` in `drupal`.
 
 ## Rule details
 
@@ -14,14 +14,14 @@ Only string literals are checked.
 
 ## Examples
 
-### ❌ Incorrect
+### Incorrect
 
 ```twig
 {{ attach_library('my_theme:button') }}
 {{ attach_library('slider') }}
 ```
 
-### ✅ Correct
+### Correct
 
 ```twig
 {{ attach_library('my_theme/slider') }}

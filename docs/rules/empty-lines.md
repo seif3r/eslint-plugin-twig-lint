@@ -2,7 +2,7 @@
 
 Allow at most one empty line in a row.
 
-🔧 Fixable with `--fix` · ✅ Enabled in `recommended`
+Fixable: yes. Level: `error` in `recommended`.
 
 ## Rule details
 
@@ -11,7 +11,7 @@ Two or more empty lines in a row are reduced to one. Lines inside `<pre>`, `<tex
 
 ## Examples
 
-### ❌ Incorrect
+### Incorrect
 
 ```twig
 <h2>{{ title }}</h2>
@@ -21,7 +21,7 @@ Two or more empty lines in a row are reduced to one. Lines inside `<pre>`, `<tex
 <p>{{ body }}</p>
 ```
 
-### ✅ Correct
+### Correct
 
 ```twig
 <h2>{{ title }}</h2>

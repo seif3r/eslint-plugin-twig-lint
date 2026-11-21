@@ -2,7 +2,7 @@
 
 Require includes to be isolated from the calling template.
 
-⚠️ `warn` in `recommended` · 💡 Has suggestions
+Fixable: no (the editor offers a suggestion). Level: `warn` in `recommended`.
 
 ## Rule details
 
@@ -20,7 +20,7 @@ caller's variables. Editors offer a suggestion that adds `with_context: false` o
 
 ## Examples
 
-### ❌ Incorrect
+### Incorrect
 
 ```twig
 {{ include('theme:card', {title: title}) }}
@@ -30,7 +30,7 @@ caller's variables. Editors offer a suggestion that adds `with_context: false` o
 {% include 'theme:card' with {title: title} %}
 ```
 
-### ✅ Correct
+### Correct
 
 ```twig
 {{ include('theme:card', {title: title}, with_context: false) }}
@@ -42,7 +42,7 @@ caller's variables. Editors offer a suggestion that adds `with_context: false` o
 
 <!-- test-options: {"embed": true} -->
 
-### ❌ Incorrect with `embed: true`
+### Incorrect with `embed: true`
 
 ```twig
 {% embed 'theme:card' %}
@@ -52,7 +52,7 @@ caller's variables. Editors offer a suggestion that adds `with_context: false` o
 {% endembed %}
 ```
 
-### ✅ Correct with `embed: true`
+### Correct with `embed: true`
 
 ```twig
 {% embed 'theme:card' only %}

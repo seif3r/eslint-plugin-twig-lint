@@ -2,7 +2,7 @@
 
 Enforce `snake_case` for names created in the template.
 
-⚠️ `warn` in `recommended`
+Fixable: no. Level: `warn` in `recommended`.
 
 ## Rule details
 
@@ -19,7 +19,7 @@ every place it is used.
 
 ## Examples
 
-### ❌ Incorrect
+### Incorrect
 
 ```twig
 {% set itemCount = items|length %}
@@ -28,7 +28,7 @@ every place it is used.
 {% endfor %}
 ```
 
-### ✅ Correct
+### Correct
 
 ```twig
 {% set item_count = items|length %}

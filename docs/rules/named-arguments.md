@@ -2,7 +2,7 @@
 
 Enforce `name: value` for named arguments.
 
-🔧 Fixable with `--fix` · ✅ Enabled in `recommended`
+Fixable: yes. Level: `error` in `recommended`.
 
 ## Rule details
 
@@ -12,13 +12,13 @@ affected.
 
 ## Examples
 
-### ❌ Incorrect
+### Incorrect
 
 ```twig
 {{ include('theme:card', with_context = false) }}
 ```
 
-### ✅ Correct
+### Correct
 
 ```twig
 {{ include('theme:card', with_context: false) }}

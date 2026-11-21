@@ -2,7 +2,7 @@
 
 Enforce single quotes for Twig strings.
 
-🔧 Fixable with `--fix` · ✅ Enabled in `recommended`
+Fixable: yes. Level: `error` in `recommended`.
 
 ## Rule details
 
@@ -14,14 +14,14 @@ Quotes in HTML attributes are not affected, only strings inside `{{ }}` and `{% 
 
 ## Examples
 
-### ❌ Incorrect
+### Incorrect
 
 ```twig
 {{ "Read more"|t }}
 {{ "a \"quoted\" word" }}
 ```
 
-### ✅ Correct
+### Correct
 
 ```twig
 {{ 'Read more'|t }}

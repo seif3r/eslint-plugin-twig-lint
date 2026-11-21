@@ -2,7 +2,7 @@
 
 Include components by their SDC ID instead of a file path.
 
-Opt-in: not enabled by `drupal`. Turn it on in your own config:
+Fixable: no. Level: off (opt-in, not enabled by `drupal`). Turn it on in your own config:
 
 ```js
 "twig-lint/drupal/component-reference": "warn"
@@ -20,13 +20,13 @@ There is no fix, because the rule cannot know which ID a path belongs to.
 
 ## Examples
 
-### ❌ Incorrect
+### Incorrect
 
 ```twig
 {{ include('@my_theme/components/card/card.twig', {title: title}, with_context: false) }}
 ```
 
-### ✅ Correct
+### Correct
 
 ```twig
 {{ include('my_theme:card', {title: title}, with_context: false) }}
@@ -38,13 +38,13 @@ There is no fix, because the rule cannot know which ID a path belongs to.
 
 <!-- test-options: {"folders": ["components", "patterns"]} -->
 
-### ❌ Incorrect with `folders: ["components", "patterns"]`
+### Incorrect with `folders: ["components", "patterns"]`
 
 ```twig
 {{ include('@my_theme/patterns/card/card.twig', with_context: false) }}
 ```
 
-### ✅ Correct with `folders: ["components", "patterns"]`
+### Correct with `folders: ["components", "patterns"]`
 
 ```twig
 {{ include('my_theme:card', with_context: false) }}

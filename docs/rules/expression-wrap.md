@@ -2,7 +2,7 @@
 
 Break Twig expressions that are longer than `printWidth`.
 
-🔧 Fixable with `--fix` · ✅ Enabled in `recommended`
+Fixable: yes. Level: `error` in `recommended`.
 
 ## Rule details
 
@@ -30,7 +30,7 @@ is left long. Tags that already span several lines are not touched.
 
 ## Examples
 
-### ❌ Incorrect
+### Incorrect
 
 ```twig
 {{ include('theme:card', {title: card.title, url: card.url, image: card.image}, with_context: false) }}
@@ -58,7 +58,7 @@ is left long. Tags that already span several lines are not touched.
 {{ items|filter(item => item.visible)|map(item => item.title)|join(', ')|default('No items') }}
 ```
 
-### ✅ Correct
+### Correct
 
 ```twig
 {{ include('theme:card', {

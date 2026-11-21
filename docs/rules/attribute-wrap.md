@@ -2,7 +2,7 @@
 
 Put one attribute per line when an opening tag is longer than `printWidth`.
 
-🔧 Fixable with `--fix` · ✅ Enabled in `recommended`
+Fixable: yes. Level: `error` in `recommended`.
 
 ## Rule details
 
@@ -22,7 +22,7 @@ attribute goes on its own line one step in, and `>` goes on its own line at the 
 
 ## Examples
 
-### ❌ Incorrect
+### Incorrect
 
 ```twig
 <a href="{{ url }}" class="button button--primary button--large" target="_blank" rel="noopener">Read more</a>
@@ -32,7 +32,7 @@ attribute goes on its own line one step in, and `>` goes on its own line at the 
 <li class="menu__item menu__item--active"{% if is_current %} aria-current="page"{% endif %}>{{ link }}</li>
 ```
 
-### ✅ Correct
+### Correct
 
 ```twig
 <a
@@ -62,7 +62,7 @@ attribute goes on its own line one step in, and `>` goes on its own line at the 
 
 <!-- test-options: {"minAttributes": 1} -->
 
-### ❌ Incorrect with `minAttributes: 1`
+### Incorrect with `minAttributes: 1`
 
 ```twig
 <div class="card card--featured card--with-a-very-long-modifier-name card--highlighted">
@@ -70,7 +70,7 @@ attribute goes on its own line one step in, and `>` goes on its own line at the 
 </div>
 ```
 
-### ✅ Correct with `minAttributes: 1`
+### Correct with `minAttributes: 1`
 
 ```twig
 <div

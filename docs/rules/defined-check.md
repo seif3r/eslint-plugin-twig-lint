@@ -2,7 +2,7 @@
 
 Simplify or require `is defined` before `is not empty`.
 
-⚠️ `warn` in `recommended` · 💡 Has suggestions
+Fixable: no (the editor offers a suggestion). Level: `warn` in `recommended`.
 
 ## Rule details
 
@@ -19,7 +19,7 @@ whether it is safe depends on how Twig is configured.
 
 ## Examples
 
-### ❌ Incorrect
+### Incorrect
 
 ```twig
 {% if title is defined and title is not empty %}
@@ -27,7 +27,7 @@ whether it is safe depends on how Twig is configured.
 {% endif %}
 ```
 
-### ✅ Correct
+### Correct
 
 ```twig
 {% if title is not empty %}
@@ -37,7 +37,7 @@ whether it is safe depends on how Twig is configured.
 
 <!-- test-options: {"mode": "require"} -->
 
-### ❌ Incorrect with `mode: "require"`
+### Incorrect with `mode: "require"`
 
 ```twig
 {% if page.title is not empty %}
@@ -45,7 +45,7 @@ whether it is safe depends on how Twig is configured.
 {% endif %}
 ```
 
-### ✅ Correct with `mode: "require"`
+### Correct with `mode: "require"`
 
 ```twig
 {% if page.title is defined and page.title is not empty %}

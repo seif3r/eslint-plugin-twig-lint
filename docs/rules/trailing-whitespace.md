@@ -2,7 +2,7 @@
 
 Disallow whitespace at the end of lines.
 
-🔧 Fixable with `--fix` · ✅ Enabled in `recommended`
+Fixable: yes. Level: `error` in `recommended`.
 
 ## Rule details
 
@@ -12,7 +12,7 @@ multi-line attribute values.
 
 ## Examples
 
-### ❌ Incorrect
+### Incorrect
 
 ```twig
 <p>{{ body }}</p>   
@@ -21,7 +21,7 @@ multi-line attribute values.
 {% endif %}
 ```
 
-### ✅ Correct
+### Correct
 
 ```twig
 <p>{{ body }}</p>

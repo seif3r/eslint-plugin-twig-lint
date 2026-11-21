@@ -2,7 +2,7 @@
 
 Enforce spacing around commas and inside brackets in Twig expressions.
 
-🔧 Fixable with `--fix` · ✅ Enabled in `recommended`
+Fixable: yes. Level: `error` in `recommended`.
 
 ## Rule details
 
@@ -13,7 +13,7 @@ Only spaces within a line are checked, so multi-line hashes, arrays and argument
 
 ## Examples
 
-### ❌ Incorrect
+### Incorrect
 
 ```twig
 {% set sizes = [ 'small' , 'medium' ,'large' ] %}
@@ -21,7 +21,7 @@ Only spaces within a line are checked, so multi-line hashes, arrays and argument
 {{ range( 1, 5 )|join(', ') }}
 ```
 
-### ✅ Correct
+### Correct
 
 ```twig
 {% set sizes = ['small', 'medium', 'large'] %}

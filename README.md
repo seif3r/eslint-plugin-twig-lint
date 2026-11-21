@@ -130,62 +130,63 @@ Shared settings go in `settings["twig-lint"]`. Every rule also accepts them as o
 
 ## Rules
 
-All rules are in `recommended`. 🔧 means `--fix` can fix it, 💡 that the editor offers a suggestion.
+All general rules are in `recommended`. Fixable rules are fixed by `--fix` and by formatting in the editor.
 
 ### Layout
 
-Enabled as `error`, all 🔧.
+Enabled as `error`.
 
-| Rule | Description |
-|---|---|
-| [`twig-lint/block-indent`](docs/rules/block-indent.md) | Indentation of Twig blocks and HTML elements |
-| [`twig-lint/nested-indent`](docs/rules/nested-indent.md) | Indentation inside multi-line expressions: one step per line that opens brackets |
-| [`twig-lint/attribute-spacing`](docs/rules/attribute-spacing.md) | `<p{{ attrs }}>` → `<p {{ attrs }}>`. Option `mode`: `space` (default) or `tight` |
-| [`twig-lint/attribute-wrap`](docs/rules/attribute-wrap.md) | One attribute per line when an opening tag is longer than `printWidth`. Option `minAttributes` (default 2) |
-| [`twig-lint/expression-wrap`](docs/rules/expression-wrap.md) | Breaks Twig expressions longer than `printWidth`: maps, `set`, `if` and call arguments |
-| [`twig-lint/delimiter-spacing`](docs/rules/delimiter-spacing.md) | Exactly one space inside `{{ }}`, `{% %}` and `{# #}` |
-| [`twig-lint/blank-line-after-block`](docs/rules/blank-line-after-block.md) | An empty line after `{% endif %}`, `{% endfor %}` and similar closing tags |
-| [`twig-lint/empty-lines`](docs/rules/empty-lines.md) | At most one empty line in a row |
-| [`twig-lint/trailing-whitespace`](docs/rules/trailing-whitespace.md) | No whitespace at the end of lines |
-| [`twig-lint/final-newline`](docs/rules/final-newline.md) | Exactly one newline at the end of the file |
+| Rule | Description | Fixable |
+|---|---|---|
+| [`twig-lint/block-indent`](docs/rules/block-indent.md) | Indentation of Twig blocks and HTML elements | yes |
+| [`twig-lint/nested-indent`](docs/rules/nested-indent.md) | Indentation inside multi-line expressions: one step per line that opens brackets | yes |
+| [`twig-lint/attribute-spacing`](docs/rules/attribute-spacing.md) | `<p{{ attrs }}>` → `<p {{ attrs }}>`. Option `mode`: `space` (default) or `tight` | yes |
+| [`twig-lint/attribute-wrap`](docs/rules/attribute-wrap.md) | One attribute per line when an opening tag is longer than `printWidth`. Option `minAttributes` (default 2) | yes |
+| [`twig-lint/expression-wrap`](docs/rules/expression-wrap.md) | Breaks Twig expressions longer than `printWidth`: maps, `set`, `if` and call arguments | yes |
+| [`twig-lint/delimiter-spacing`](docs/rules/delimiter-spacing.md) | Exactly one space inside `{{ }}`, `{% %}` and `{# #}` | yes |
+| [`twig-lint/blank-line-after-block`](docs/rules/blank-line-after-block.md) | An empty line after `{% endif %}`, `{% endfor %}` and similar closing tags | yes |
+| [`twig-lint/empty-lines`](docs/rules/empty-lines.md) | At most one empty line in a row | yes |
+| [`twig-lint/trailing-whitespace`](docs/rules/trailing-whitespace.md) | No whitespace at the end of lines | yes |
+| [`twig-lint/final-newline`](docs/rules/final-newline.md) | Exactly one newline at the end of the file | yes |
 
 ### Syntax
 
-Enabled as `error`, all 🔧.
+Enabled as `error`.
 
-| Rule | Description |
-|---|---|
-| [`twig-lint/operator-spacing`](docs/rules/operator-spacing.md) | One space around binary operators, none around `.`, `\|` and `..` |
-| [`twig-lint/punctuation-spacing`](docs/rules/punctuation-spacing.md) | One space after commas, none inside brackets |
-| [`twig-lint/hash-spacing`](docs/rules/hash-spacing.md) | `{key: value}` and `name: value`: no space before the colon, one after |
-| [`twig-lint/single-quotes`](docs/rules/single-quotes.md) | `'single'` quotes unless the string contains `'` or uses interpolation |
-| [`twig-lint/hash-key-quotes`](docs/rules/hash-key-quotes.md) | No quotes around plain hash keys: `{'class': x}` → `{class: x}` |
-| [`twig-lint/trailing-comma`](docs/rules/trailing-comma.md) | A trailing comma when the closing bracket is on its own line. Option `multiline` |
-| [`twig-lint/named-arguments`](docs/rules/named-arguments.md) | `with_context: false` instead of the deprecated `with_context = false` |
-| [`twig-lint/endblock-name`](docs/rules/endblock-name.md) | `{% endblock content %}` and `{% endmacro card %}`. Options `mode`: `always` (default) or `never`, and `minLines` |
-| [`twig-lint/include-style`](docs/rules/include-style.md) | `{{ include() }}` or `{% include %}`. Option `style`: `both` (default), `function` or `tag` |
+| Rule | Description | Fixable |
+|---|---|---|
+| [`twig-lint/operator-spacing`](docs/rules/operator-spacing.md) | One space around binary operators, none around `.`, `\|` and `..` | yes |
+| [`twig-lint/punctuation-spacing`](docs/rules/punctuation-spacing.md) | One space after commas, none inside brackets | yes |
+| [`twig-lint/hash-spacing`](docs/rules/hash-spacing.md) | `{key: value}` and `name: value`: no space before the colon, one after | yes |
+| [`twig-lint/single-quotes`](docs/rules/single-quotes.md) | `'single'` quotes unless the string contains `'` or uses interpolation | yes |
+| [`twig-lint/hash-key-quotes`](docs/rules/hash-key-quotes.md) | No quotes around plain hash keys: `{'class': x}` → `{class: x}` | yes |
+| [`twig-lint/trailing-comma`](docs/rules/trailing-comma.md) | A trailing comma when the closing bracket is on its own line. Option `multiline` | yes |
+| [`twig-lint/named-arguments`](docs/rules/named-arguments.md) | `with_context: false` instead of the deprecated `with_context = false` | yes |
+| [`twig-lint/endblock-name`](docs/rules/endblock-name.md) | `{% endblock content %}` and `{% endmacro card %}`. Options `mode`: `always` (default) or `never`, and `minLines` | yes |
+| [`twig-lint/include-style`](docs/rules/include-style.md) | `{{ include() }}` or `{% include %}`. Option `style`: `both` (default), `function` or `tag` | yes |
 
 ### Best Practices
 
-Enabled as `warn`.
+Enabled as `warn`. These rules point out code that works but may cause problems, so they are never fixed
+automatically. Two of them offer a suggestion that you can apply in the editor.
 
-| Rule | Description |
-|---|---|
-| [`twig-lint/isolated-include`](docs/rules/isolated-include.md) | 💡 `include()` with `with_context: false` and `{% include %}` with `only`. Option `embed` |
-| [`twig-lint/defined-check`](docs/rules/defined-check.md) | 💡 `x is defined and x is not empty` → `x is not empty`. Option `mode`: `simplify`, `require` or `allow` |
-| [`twig-lint/variable-name`](docs/rules/variable-name.md) | `snake_case` for variables, loop variables, macros and arrow function parameters created in the template |
-| [`twig-lint/no-raw`](docs/rules/no-raw.md) | Warns about `\|raw`, which turns off escaping. Option `allow` for known-safe values |
-| [`twig-lint/deprecated-spaceless`](docs/rules/deprecated-spaceless.md) | Warns about the `spaceless` filter, deprecated since Twig 3.12 |
+| Rule | Description | Fixable |
+|---|---|---|
+| [`twig-lint/isolated-include`](docs/rules/isolated-include.md) | `include()` with `with_context: false` and `{% include %}` with `only`. Option `embed`. The editor suggests the fix | no |
+| [`twig-lint/defined-check`](docs/rules/defined-check.md) | `x is defined and x is not empty` → `x is not empty`. Option `mode`: `simplify`, `require` or `allow`. The editor suggests the fix | no |
+| [`twig-lint/variable-name`](docs/rules/variable-name.md) | `snake_case` for variables, loop variables, macros and arrow function parameters created in the template | no |
+| [`twig-lint/no-raw`](docs/rules/no-raw.md) | Warns about `\|raw`, which turns off escaping. Option `allow` for known-safe values | no |
+| [`twig-lint/deprecated-spaceless`](docs/rules/deprecated-spaceless.md) | Warns about the `spaceless` filter, deprecated since Twig 3.12 | no |
 
 ### Drupal
 
 Enabled by the `drupal` preset.
 
-| Rule | Description |
-|---|---|
-| [`twig-lint/drupal/attach-library-format`](docs/rules/drupal/attach-library-format.md) | `attach_library('extension/library')`, not a component ID like `'theme:button'`. `error` |
-| [`twig-lint/drupal/no-translate-variable`](docs/rules/drupal/no-translate-variable.md) | `\|t` on a variable cannot be extracted for translation. `warn` |
-| [`twig-lint/drupal/component-reference`](docs/rules/drupal/component-reference.md) | Include components by SDC ID, not by file path. Option `folders`. Opt-in |
+| Rule | Description | Fixable | Level |
+|---|---|---|---|
+| [`twig-lint/drupal/attach-library-format`](docs/rules/drupal/attach-library-format.md) | `attach_library('extension/library')`, not a component ID like `'theme:button'` | no | error |
+| [`twig-lint/drupal/no-translate-variable`](docs/rules/drupal/no-translate-variable.md) | `\|t` on a variable cannot be extracted for translation | no | warn |
+| [`twig-lint/drupal/component-reference`](docs/rules/drupal/component-reference.md) | Include components by SDC ID, not by file path. Option `folders` | no | off (opt-in) |
 
 ### Examples
 

@@ -2,7 +2,7 @@
 
 Disallow translating a variable with `|t`.
 
-⚠️ `warn` in `drupal`
+Fixable: no. Level: `warn` in `drupal`.
 
 ## Rule details
 
@@ -15,14 +15,14 @@ placeholders.
 
 ## Examples
 
-### ❌ Incorrect
+### Incorrect
 
 ```twig
 {{ label|t }}
 {{ 'Read more'|upper|t }}
 ```
 
-### ✅ Correct
+### Correct
 
 ```twig
 {{ 'Read more'|t }}

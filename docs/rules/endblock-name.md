@@ -2,7 +2,7 @@
 
 Enforce or disallow the block name on `{% endblock %}` and `{% endmacro %}`.
 
-🔧 Fixable with `--fix` · ✅ Enabled in `recommended`
+Fixable: yes. Level: `error` in `recommended`.
 
 ## Rule details
 
@@ -20,7 +20,7 @@ Short blocks without an end tag, such as `{% block title page_title %}`, are not
 
 ## Examples
 
-### ❌ Incorrect
+### Incorrect
 
 ```twig
 {% block content %}
@@ -34,7 +34,7 @@ Short blocks without an end tag, such as `{% block title page_title %}`, are not
 {% endmacro cards %}
 ```
 
-### ✅ Correct
+### Correct
 
 ```twig
 {% block content %}
@@ -50,7 +50,7 @@ Short blocks without an end tag, such as `{% block title page_title %}`, are not
 
 <!-- test-options: {"minLines": 4} -->
 
-### ❌ Incorrect with `minLines: 4`
+### Incorrect with `minLines: 4`
 
 ```twig
 {% block content %}
@@ -59,7 +59,7 @@ Short blocks without an end tag, such as `{% block title page_title %}`, are not
 {% endblock %}
 ```
 
-### ✅ Correct with `minLines: 4`
+### Correct with `minLines: 4`
 
 ```twig
 {% block content %}

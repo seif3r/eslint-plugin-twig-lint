@@ -2,7 +2,7 @@
 
 Enforce a space before attribute output in HTML tags.
 
-🔧 Fixable with `--fix` · ✅ Enabled in `recommended`
+Fixable: yes. Level: `error` in `recommended`.
 
 ## Rule details
 
@@ -18,7 +18,7 @@ The rule does not touch:
 
 ## Examples
 
-### ❌ Incorrect
+### Incorrect
 
 ```twig
 <div{{ attributes }}>
@@ -26,7 +26,7 @@ The rule does not touch:
 </div>
 ```
 
-### ✅ Correct
+### Correct
 
 ```twig
 <div {{ attributes }}>

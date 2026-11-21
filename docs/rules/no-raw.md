@@ -2,7 +2,7 @@
 
 Warn about the `raw` filter, which turns off escaping.
 
-⚠️ `warn` in `recommended`
+Fixable: no. Level: `warn` in `recommended`.
 
 ## Rule details
 
@@ -15,13 +15,13 @@ values that are safe in the `allow` option.
 
 ## Examples
 
-### ❌ Incorrect
+### Incorrect
 
 ```twig
 {{ user_bio|raw }}
 ```
 
-### ✅ Correct
+### Correct
 
 ```twig
 {{ user_bio }}
@@ -34,7 +34,7 @@ values that are safe in the `allow` option.
 
 <!-- test-options: {"allow": ["_block_*", "media"]} -->
 
-### ✅ Correct with `allow: ["_block_*", "media"]`
+### Correct with `allow: ["_block_*", "media"]`
 
 ```twig
 {{ _block_content|raw }}

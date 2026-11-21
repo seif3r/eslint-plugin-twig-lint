@@ -22,7 +22,7 @@ interface Group {
 function examples(markdown: string): Group[] {
   const groups: Group[] = [{ options: '', incorrect: [], correct: [] }];
   let section: 'incorrect' | 'correct' | null = null;
-  const re = /^<!-- test-options: (.*) -->$|^### (❌ Incorrect|✅ Correct)\b.*$|^## |^```twig\n([\s\S]*?)^```$/gm;
+  const re = /^<!-- test-options: (.*) -->$|^### (Incorrect|Correct)\b.*$|^## |^```twig\n([\s\S]*?)^```$/gm;
   for (const m of markdown.matchAll(re)) {
     if (m[1] !== undefined) groups.push({ options: m[1], incorrect: [], correct: [] });
     else if (m[2]) section = m[2].includes('Incorrect') ? 'incorrect' : 'correct';

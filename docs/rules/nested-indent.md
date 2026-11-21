@@ -2,7 +2,7 @@
 
 Enforce indentation inside multi-line Twig expressions.
 
-🔧 Fixable with `--fix` · ✅ Enabled in `recommended`
+Fixable: yes. Level: `error` in `recommended`.
 
 ## Rule details
 
@@ -21,7 +21,7 @@ Expressions are never collapsed into one line. Long single-line expressions are 
 
 ## Examples
 
-### ❌ Incorrect
+### Incorrect
 
 ```twig
 {% set attributes = create_attribute({
@@ -31,7 +31,7 @@ Expressions are never collapsed into one line. Long single-line expressions are 
   }) %}
 ```
 
-### ✅ Correct
+### Correct
 
 ```twig
 {% set attributes = create_attribute({

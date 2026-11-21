@@ -2,7 +2,7 @@
 
 Enforce indentation of Twig blocks and HTML elements.
 
-🔧 Fixable with `--fix` · ✅ Enabled in `recommended`
+Fixable: yes. Level: `error` in `recommended`.
 
 ## Rule details
 
@@ -20,7 +20,7 @@ Indentation inside multi-line expressions is handled by [`nested-indent`](nested
 
 ## Examples
 
-### ❌ Incorrect
+### Incorrect
 
 ```twig
 <ul>
@@ -30,7 +30,7 @@ Indentation inside multi-line expressions is handled by [`nested-indent`](nested
 </ul>
 ```
 
-### ✅ Correct
+### Correct
 
 ```twig
 <ul>

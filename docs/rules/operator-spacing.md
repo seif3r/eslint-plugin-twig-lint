@@ -2,7 +2,7 @@
 
 Enforce spacing around operators in Twig expressions.
 
-🔧 Fixable with `--fix` · ✅ Enabled in `recommended`
+Fixable: yes. Level: `error` in `recommended`.
 
 ## Rule details
 
@@ -18,7 +18,7 @@ Only spaces within a line are checked. A line break next to an operator, as in a
 
 ## Examples
 
-### ❌ Incorrect
+### Incorrect
 
 ```twig
 {% set total = price*quantity+shipping %}
@@ -26,7 +26,7 @@ Only spaces within a line are checked. A line break next to an operator, as in a
 {{ is_active?'Active':'Inactive' }}
 ```
 
-### ✅ Correct
+### Correct
 
 ```twig
 {% set total = price * quantity + shipping %}

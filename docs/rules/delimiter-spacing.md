@@ -2,7 +2,7 @@
 
 Require exactly one space inside Twig delimiters.
 
-🔧 Fixable with `--fix` · ✅ Enabled in `recommended`
+Fixable: yes. Level: `error` in `recommended`.
 
 ## Rule details
 
@@ -12,7 +12,7 @@ newline is left alone, so multi-line tags and comments keep their layout.
 
 ## Examples
 
-### ❌ Incorrect
+### Incorrect
 
 ```twig
 {{item.title}}
@@ -22,7 +22,7 @@ newline is left alone, so multi-line tags and comments keep their layout.
 {#note#}
 ```
 
-### ✅ Correct
+### Correct
 
 ```twig
 {{ item.title }}

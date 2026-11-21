@@ -2,7 +2,7 @@
 
 Disallow unnecessary quotes around hash keys.
 
-🔧 Fixable with `--fix` · ✅ Enabled in `recommended`
+Fixable: yes. Level: `error` in `recommended`.
 
 ## Rule details
 
@@ -12,13 +12,13 @@ their quotes and are left alone.
 
 ## Examples
 
-### ❌ Incorrect
+### Incorrect
 
 ```twig
 {% set config = {'title': title, "size": 'large'} %}
 ```
 
-### ✅ Correct
+### Correct
 
 ```twig
 {% set config = {title: title, size: 'large'} %}

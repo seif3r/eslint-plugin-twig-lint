@@ -2,7 +2,7 @@
 
 Require an empty line after a closing block tag.
 
-🔧 Fixable with `--fix` · ✅ Enabled in `recommended`
+Fixable: yes. Level: `error` in `recommended`.
 
 ## Rule details
 
@@ -21,7 +21,7 @@ The extra newline does not change the rendered page. The rule does not apply ins
 
 ## Examples
 
-### ❌ Incorrect
+### Incorrect
 
 ```twig
 {% if title %}
@@ -30,7 +30,7 @@ The extra newline does not change the rendered page. The rule does not apply ins
 <p>{{ body }}</p>
 ```
 
-### ✅ Correct
+### Correct
 
 ```twig
 {% if title %}

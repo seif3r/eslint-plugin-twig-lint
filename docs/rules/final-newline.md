@@ -2,7 +2,7 @@
 
 Require exactly one newline at the end of the file.
 
-🔧 Fixable with `--fix` · ✅ Enabled in `recommended`
+Fixable: yes. Level: `error` in `recommended`.
 
 ## Rule details
 
@@ -11,7 +11,7 @@ removed. Files with Windows line endings get `\r\n`. An empty file is left alone
 
 ## Examples
 
-### ❌ Incorrect
+### Incorrect
 
 ```twig
 <p>{{ body }}</p>
@@ -19,7 +19,7 @@ removed. Files with Windows line endings get `\r\n`. An empty file is left alone
 
 ```
 
-### ✅ Correct
+### Correct
 
 ```twig
 <p>{{ body }}</p>
