@@ -25,8 +25,19 @@ is used depends on the expression:
      ternary, breaking at `|` would misrepresent precedence, so those are left alone.
   2. A plain function or macro call gets one argument per line with a trailing comma.
 
+- **E. One element of an expression that already spans several lines** (a map entry, an array item or an
+  argument on its own line):
+  1. A ternary value breaks before `?` and `:`, one step in.
+  2. Otherwise the value breaks before each operator of the lowest precedence at the top level, with the
+     operator first on the line, one step in. Only `~`, `+`, `-`, `and`, `or` and `??` are broken. If the
+     lowest operator is a comparison or `starts with`, the line is left long.
+  3. A parenthesized ternary that is still too long after that keeps its condition after `(`, puts `?` and `:`
+     on their own lines one step in, and `)` on its own line.
+
+  A map key or named argument stays on the first line.
+
 Strings are never broken, and parentheses are never added or removed. If none of the above applies, the line
-is left long. Tags that already span several lines are not touched.
+is left long. Apart from E, tags that already span several lines are not touched.
 
 ## Examples
 
@@ -56,6 +67,13 @@ is left long. Tags that already span several lines are not touched.
 
 ```twig
 {{ items|filter(item => item.visible)|map(item => item.title)|join(', ')|default('No items') }}
+```
+
+```twig
+{% set grid_attributes = create_attribute({
+  style: 'grid-template-columns: minmax(0, 1fr)' ~ (columns|length > 1 ? ' repeat(' ~ (columns|length - 1) ~ ', fit-content(20rem))' : '') ~ ';',
+  title: is_featured ? 'Featured content for the current visitor' : 'Regular content for everyone',
+}) %}
 ```
 
 ### Correct
@@ -107,6 +125,20 @@ is left long. Tags that already span several lines are not touched.
   |map(item => item.title)
   |join(', ')
   |default('No items') }}
+```
+
+```twig
+{% set grid_attributes = create_attribute({
+  style: 'grid-template-columns: minmax(0, 1fr)'
+    ~ (columns|length > 1
+      ? ' repeat(' ~ (columns|length - 1) ~ ', fit-content(20rem))'
+      : ''
+    )
+    ~ ';',
+  title: is_featured
+    ? 'Featured content for the current visitor'
+    : 'Regular content for everyone',
+}) %}
 ```
 
 ## Options

@@ -1,0 +1,15 @@
+{% set grid_attributes = create_attribute({
+  class: [
+    'grid',
+    'grid--' ~ columns|length ~ '-cols',
+  ],
+  style: 'grid-template-columns: minmax(0, 1fr)' ~ (columns|length > 1 ? ' repeat(' ~ (columns|length - 1) ~ ', fit-content(20rem))' : '') ~ ';',
+  title: is_featured ? 'Featured content for the current visitor' : 'Regular content for everyone',
+  'data-note': 'This value is deliberately one long string literal that cannot be broken',
+}, attributes) %}
+<div {{ grid_attributes }}>
+  {{ include('theme:badge', {
+    label: badge_prefix ~ ' ' ~ badge_text|default('Untitled badge text') ~ ' ' ~ badge_suffix,
+    count: items|length,
+  }, with_context: false) }}
+</div>

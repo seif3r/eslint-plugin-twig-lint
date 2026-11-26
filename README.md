@@ -155,7 +155,7 @@ Enabled as `error`.
 | [`twig-lint/nested-indent`](docs/rules/nested-indent.md) | Indentation inside multi-line expressions: one step per line that opens brackets | yes |
 | [`twig-lint/attribute-spacing`](docs/rules/attribute-spacing.md) | `<p{{ attrs }}>` → `<p {{ attrs }}>`. Option `mode`: `space` (default) or `tight` | yes |
 | [`twig-lint/attribute-wrap`](docs/rules/attribute-wrap.md) | One attribute per line when an opening tag is longer than `printWidth`. Option `minAttributes` (default 2) | yes |
-| [`twig-lint/expression-wrap`](docs/rules/expression-wrap.md) | Breaks Twig expressions longer than `printWidth`: maps, `set`, `if` and call arguments | yes |
+| [`twig-lint/expression-wrap`](docs/rules/expression-wrap.md) | Breaks Twig expressions longer than `printWidth`: maps, `set`, `if`, call arguments and long map entries | yes |
 | [`twig-lint/delimiter-spacing`](docs/rules/delimiter-spacing.md) | Exactly one space inside `{{ }}`, `{% %}` and `{# #}` | yes |
 | [`twig-lint/blank-line-after-block`](docs/rules/blank-line-after-block.md) | An empty line after `{% endif %}`, `{% endfor %}` and similar closing tags | yes |
 | [`twig-lint/empty-lines`](docs/rules/empty-lines.md) | At most one empty line in a row | yes |

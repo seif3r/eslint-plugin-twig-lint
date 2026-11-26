@@ -12,7 +12,9 @@ A multi-line expression keeps its line breaks and is re-indented:
   `create_attribute({` adds one step, not two.
 - A line that starts with a closing bracket (`}`, `]`, `)`) or closing delimiter (`%}`, `}}`) gets the same
   indentation as the line that opened it.
-- A line that starts with `?` or `:` in a ternary gets one extra step.
+- A line that starts with a binary operator (`?` and `:` in a ternary, `~`, `+`, `and` …) is one step in from
+  the line where the expression it continues starts, i.e. the first token after the nearest `,`, `=` or
+  opening bracket. In a map entry that is the line with the key.
 - A line that starts with `and` or `or` directly inside an `{% if %}` or `{% elseif %}` tag is indented two
   steps, so it stands out from the block content.
 
