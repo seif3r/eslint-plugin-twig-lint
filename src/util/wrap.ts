@@ -9,6 +9,7 @@ import type { HtmlTag } from '../language/html.ts';
 import type { BlockPair, Doc } from '../language/parse.ts';
 import { computeIndents, indentString } from './indent.ts';
 import type { Edit, SharedSettings } from './rule.ts';
+import { analyze, type SegmentSyntax } from './syntax.ts';
 
 export interface WrapProblem {
   pos: number;
@@ -374,12 +375,138 @@ function wrapOutput(src: string, seg: Segment): Array<[number, string]> | null {
   return wrapCall(src, seg, last);
 }
 
+// E: a single element (map entry, array item or argument) on its own line in an expression that is
+// already broken over several lines. Breaks the element's value before its lowest-precedence operator
+// (`~`, `+`, `-`, `and`, `or`, `??`), and a parenthesised ternary that is still too long at `?` and `:`.
+// A ternary value is broken at `?` and `:` (like B3). Strings are never broken.
+
+/** Twig 3 precedence of binary operators. Unknown word operators count as comparisons. */
+const PRECEDENCE: Record<string, number> = {
+  '??': 5, or: 10, xor: 12, and: 15, 'b-or': 16, 'b-xor': 17, 'b-and': 18,
+  '==': 20, '!=': 20, '<=>': 20, '<': 20, '>': 20, '<=': 20, '>=': 20, '===': 20, '!==': 20,
+  '..': 25, '+': 30, '-': 30, '~': 40, '*': 60, '/': 60, '//': 60, '%': 60, '**': 200,
+};
+const BREAKABLE = new Set(['??', 'or', 'and', '+', '-', '~']);
+
+interface Part {
+  /** Operator before this part (empty for the first part). */
+  op: string;
+  a: number;
+  b: number;
+}
+
+/** Top-level ternary in [from, to]: indexes of `?` and its `:`. */
+function ternaryAt(syntax: SegmentSyntax, from: number, to: number): { q: number; c: number } | null {
+  const top = topLevel(syntax.tokens, from, to);
+  const q = top.find((k) => syntax.tokens[k]!.type === 'punctuation' && syntax.tokens[k]!.value === '?');
+  if (q === undefined || q === from) return null;
+  const c = top.find((k) => k > q && syntax.colons.get(k) === 'ternary');
+  if (c === undefined || c === q + 1 || c === to) return null;
+  return { q, c };
+}
+
+/** Splits [from, to] before every top-level binary operator of the lowest precedence, if it is breakable. */
+function splitOperators(syntax: SegmentSyntax, from: number, to: number): Part[] | null {
+  const ops = topLevel(syntax.tokens, from, to).filter((k) => k > from && k < to && syntax.isBinary(k));
+  if (!ops.length) return null;
+  const prec = (k: number) => PRECEDENCE[syntax.tokens[k]!.value] ?? 20;
+  const lowest = Math.min(...ops.map(prec));
+  const at = ops.filter((k) => prec(k) === lowest);
+  if (!at.every((k) => BREAKABLE.has(syntax.tokens[k]!.value))) return null;
+  const parts: Part[] = [];
+  let a = from;
+  let op = '';
+  for (const k of at) {
+    parts.push({ op, a, b: k - 1 });
+    op = syntax.tokens[k]!.value;
+    a = k + 1;
+  }
+  parts.push({ op, a, b: to });
+  return parts;
+}
+
+function elementLines(
+  src: string, syntax: SegmentSyntax, a: number, b: number, fits: (level: number, text: string, last: boolean) => boolean,
+): Array<[number, string]> | null {
+  const tokens = syntax.tokens;
+  // A hash key or named argument stays on the first line.
+  let v = a;
+  let prefix = '';
+  const colon = tokens[a + 1];
+  if (colon && colon.type === 'punctuation' && colon.value === ':' && syntax.colons.get(a + 1) !== 'ternary' && a + 2 <= b) {
+    v = a + 2;
+    prefix = src.slice(tokens[a]!.start, tokens[v]!.start);
+  }
+  const ternary = ternaryAt(syntax, v, b);
+  if (ternary) {
+    const { q, c } = ternary;
+    return [
+      [0, prefix + text(src, tokens, v, q - 1)],
+      [1, `? ${text(src, tokens, q + 1, c - 1)}`],
+      [1, `: ${text(src, tokens, c + 1, b)}`],
+    ];
+  }
+  const parts = splitOperators(syntax, v, b);
+  if (!parts) return null;
+  const lines: Array<[number, string]> = [];
+  parts.forEach((part, i) => {
+    const level = i === 0 ? 0 : 1;
+    const lead = i === 0 ? prefix : `${part.op} `;
+    const last = i === parts.length - 1;
+    const whole = lead + text(src, tokens, part.a, part.b);
+    const open = tokens[part.a]!;
+    const inner = open.type === 'punctuation' && open.value === '(' && open.match === part.b
+      ? ternaryAt(syntax, part.a + 1, part.b - 1)
+      : null;
+    if (fits(level, whole, last) || !inner) {
+      lines.push([level, whole]);
+      return;
+    }
+    lines.push([level, `${lead}(${text(src, tokens, part.a + 1, inner.q - 1)}`]);
+    lines.push([level + 1, `? ${text(src, tokens, inner.q + 1, inner.c - 1)}`]);
+    lines.push([level + 1, `: ${text(src, tokens, inner.c + 1, part.b - 1)}`]);
+    lines.push([level, ')']);
+  });
+  return lines;
+}
+
+function elementWrapProblems(ctx: Ctx, settings: SharedSettings, seg: Segment, out: WrapProblem[]): void {
+  const { doc } = ctx;
+  const tokens = seg.tokens;
+  const syntax = analyze(seg);
+  tokens.forEach((open, o) => {
+    if (!syntax.isOpener(o) || open.match === undefined) return;
+    const close = open.match;
+    if (sameLine(doc, open.end, tokens[close]!.start)) return;
+    for (const [a, b] of splitCommas(tokens, o + 1, close - 1)) {
+      const first = tokens[a]!;
+      const lastTok = tokens[b]!;
+      if (!sameLine(doc, first.start, lastTok.end)) continue;
+      const info = lineInfo(ctx, first.start);
+      const line = doc.lines[info.li]!;
+      if (!info.atStart || doc.isFrozenLine(line.start)) continue;
+      const after = doc.src.slice(lastTok.end, line.end).trim();
+      if (after !== '' && after !== ',') continue;
+      const comma = after === ',' ? 1 : 0;
+      if (info.col + (lastTok.end - first.start) + comma <= settings.printWidth) continue;
+      const fits = (level: number, t: string, last: boolean) =>
+        info.col + level * ctx.unit + t.length + (last ? comma : 0) <= settings.printWidth;
+      const lines = elementLines(doc.src, syntax, a, b, fits);
+      if (!lines || lines.length < 2) continue;
+      out.push({ pos: first.start, edit: { start: first.start, end: lastTok.end, text: render(ctx, info.col, lines) } });
+    }
+  });
+}
+
 export function expressionWrapProblems(doc: Doc, settings: SharedSettings): WrapProblem[] {
   const ctx: Ctx = { doc, cols: computeIndents(doc, settings.indentSize), unit: settings.indentSize, useTabs: settings.useTabs };
   const out: WrapProblem[] = [];
   for (const seg of doc.segments) {
     if (seg.kind !== 'output' && seg.kind !== 'block') continue;
-    if (!sameLine(doc, seg.start, seg.end)) continue;
+    if (!sameLine(doc, seg.start, seg.end)) {
+      elementWrapProblems(ctx, settings, seg, out);
+      continue;
+    }
     const info = lineInfo(ctx, seg.start);
     const line = doc.lines[info.li]!;
     if (!info.atStart || doc.src.slice(seg.end, line.end).trim() !== '' || doc.isFrozenLine(line.start)) continue;

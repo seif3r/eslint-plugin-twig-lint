@@ -104,6 +104,64 @@ test('expression-wrap: set falls back to breaking after = when the call does not
   assert.equal(await fix(input), "{% set formatted_publication_date_label =\n  node.field_publication_date.value|date('Y-m-d')\n%}\n");
 });
 
+test('expression-wrap E: unary minus at the start of an array item is not a continuation', async () => {
+  const input = '{% set offsets = [\n  -1,\n  -2,\n] %}\n';
+  assert.equal(await fix(input), input);
+});
+
+test('expression-wrap E: an element whose lowest operator is a comparison is left long', async () => {
+  const input = [
+    '{{ include(\'x\', {',
+    '  over: count_of_items_in_the_current_list + items_from_the_other_list > maximum_allowed_items,',
+    '  pick: field_name_of_the_current_paragraph starts with \'field_section_heading_and_more\',',
+    '}) }}',
+    '',
+  ].join('\n');
+  assert.ok(input.split('\n')[1]!.length > 80 && input.split('\n')[2]!.length > 80);
+  assert.equal(await fix(input), input);
+});
+
+test('expression-wrap E: a parenthesised ternary that fits after the operator split stays on one line', async () => {
+  const input = [
+    '{% set a = create_attribute({',
+    "  style: 'width: ' ~ (is_wide ? '100%' : '50%') ~ '; height: ' ~ height_in_pixels ~ 'px;',",
+    '}) %}',
+    '',
+  ].join('\n');
+  const expected = [
+    '{% set a = create_attribute({',
+    "  style: 'width: '",
+    "    ~ (is_wide ? '100%' : '50%')",
+    "    ~ '; height: '",
+    '    ~ height_in_pixels',
+    "    ~ 'px;',",
+    '}) %}',
+    '',
+  ].join('\n');
+  assert.equal(await fix(input), expected);
+  assert.equal(await fix(expected), expected);
+});
+
+test('expression-wrap E: an array item without a key', async () => {
+  const input = [
+    '{% set classes = [',
+    "  'card',",
+    "  is_highlighted ? 'card--highlighted card--with-border' : 'card--plain card--without-border',",
+    '] %}',
+    '',
+  ].join('\n');
+  const expected = [
+    '{% set classes = [',
+    "  'card',",
+    '  is_highlighted',
+    "    ? 'card--highlighted card--with-border'",
+    "    : 'card--plain card--without-border',",
+    '] %}',
+    '',
+  ].join('\n');
+  assert.equal(await fix(input), expected);
+});
+
 test('deprecated-spaceless: the removed spaceless tag', async () => {
   assert.ok((await problems('{% spaceless %}<b>x</b>{% endspaceless %}\n')).includes('1:twig-lint/deprecated-spaceless'));
 });
